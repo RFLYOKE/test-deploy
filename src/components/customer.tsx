@@ -126,7 +126,7 @@ export default function CustomerPage() {
           onChange={(e) => setSearch(e.target.value)}
           className="w-full sm:w-1/2"
         />
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <ImportExportButton
             onImport={handleImport}
             onExport={handleExport}

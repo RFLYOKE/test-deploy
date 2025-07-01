@@ -94,7 +94,7 @@ export default function RolePage() {
   return (
     <main className="p-6 w-full mx-auto">
       <section className="space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <h2 className="text-2xl font-semibold">Data Peran</h2>
             <p className="text-sm text-muted-foreground">
@@ -102,7 +102,7 @@ export default function RolePage() {
             </p>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <input
               type="text"
               placeholder="Pencarian peran..."
