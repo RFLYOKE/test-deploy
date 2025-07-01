@@ -6,11 +6,7 @@ import { cookies } from "next/headers";
 import { cn } from "@/lib/utils";
 import { fontVariables } from "@/lib/fonts";
 import ReduxProvider from "@/providers/redux";
-
-export const META_THEME_COLORS = {
-  light: "#ffffff",
-  dark: "#09090b",
-};
+// import { META_THEME_COLORS } from "@/lib/theme";
 
 export const metadata: Metadata = {
   title: "Smart Sales",
