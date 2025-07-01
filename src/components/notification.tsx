@@ -11,15 +11,10 @@ import {
 
 export default function NotificationPage() {
   const [page, setPage] = useState(1);
-  const { data, isLoading, refetch } = useGetNotificationsQuery(
-    { page, paginate: 10 },
-    {
-      pollingInterval: 5000, // refresh setiap 5 detik
-      refetchOnFocus: true, // saat pindah tab lalu kembali, akan refresh
-      refetchOnMountOrArgChange: true, // saat ganti page juga refresh
-    }
-  );
-  
+  const { data, isLoading, refetch } = useGetNotificationsQuery({
+    page,
+    paginate: 10,
+  });
 
   const [markAsRead] = useMarkNotificationAsReadMutation();
 
@@ -51,6 +46,7 @@ export default function NotificationPage() {
   return (
     <div className="p-6 space-y-6">
       <h1 className="text-2xl font-bold">Notifikasi</h1>
+      <p className="text-xs text-white">* Jika belum ada button download, harap refresh halaman</p>
 
       <Card>
         <CardContent className="overflow-x-auto p-0">

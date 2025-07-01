@@ -42,9 +42,7 @@ export default function RouteOptimizationSection() {
   const [showForm, setShowForm] = useState(false);
   const [showRoutes, setShowRoutes] = useState(false);
 
-  const [routeCoordinates, setRouteCoordinates] = useState<[number, number][]>(
-    []
-  );
+  const [routeCoordinates, setRouteCoordinates] = useState<any[]>([]);
   const [newPoint, setNewPoint] = useState({ lat: "", lng: "" });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
