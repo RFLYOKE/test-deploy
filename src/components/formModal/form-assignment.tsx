@@ -105,7 +105,7 @@ export default function AssignmentForm({
             onChange={(e) =>
               setForm({ ...form, sales_id: Number(e.target.value) })
             }
-            disabled={loadingSales || !form.coordinator_id}
+            disabled={loadingSales}
             className="border rounded-md px-3 py-2 text-sm bg-white dark:bg-zinc-800"
           >
             <option value="">Pilih Sales</option>
