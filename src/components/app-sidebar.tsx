@@ -37,123 +37,113 @@ const data = {
   navMain: [
     {
       title: "Dashboard",
-      url: "/dashboard/superadmin",
+      url: "/admin/dashboard/superadmin",
       icon: IconDashboard,
     },
     {
       title: "Manajemen Customer",
-      url: "/cust-management",
+      url: "/admin/cust-management",
       icon: IconUsersGroup,
     },
     {
       title: "Sales Operation",
-      url: "/sales-operation",
+      url: "/admin/sales-operation",
       icon: IconFileNeutral,
       children: [
         {
           title: "Sales",
-          url: "/sales-operation/sales",
+          url: "/admin/sales-operation/sales",
         },
         {
           title: "Assignment",
-          url: "/sales-operation/assignment",
+          url: "/admin/sales-operation/assignment",
         },
         {
           title: "Task Schedule",
-          url: "/sales-operation/task-activity",
+          url: "/admin/sales-operation/task-activity",
         },
         {
           title: "Penugasan Prospect",
-          url: "/sales-operation/prospect-assignment",
+          url: "/admin/sales-operation/prospect-assignment",
         },
         {
           title: "Prospect Review",
-          url: "/sales-operation/prospect-review",
+          url: "/admin/sales-operation/prospect-review",
         },
         {
           title: "Prospect Approval",
-          url: "/sales-operation/prospect-approval",
+          url: "/admin/sales-operation/prospect-approval",
         },
         {
           title: "Rekonsiliasi",
-          url: "/sales-operation/reconciliation",
+          url: "/admin/sales-operation/reconciliation",
         },
       ],
     },
     {
       title: "Manajemen Sales",
-      url: "/sales-management/funding-product",
+      url: "/admin/sales-management/funding-product",
       icon: IconBuildingStore,
       children: [
         {
           title: "Funding Product",
-          url: "/sales-management/funding-product",
+          url: "/admin/sales-management/funding-product",
         },
         {
           title: "Lending Product",
-          url: "/sales-management/lending-product",
+          url: "/admin/sales-management/lending-product",
         },
         {
           title: "Funding Transaksi",
-          url: "/sales-management/funding-transaction",
+          url: "/admin/sales-management/funding-transaction",
         },
         {
           title: "Lending Transaksi",
-          url: "/sales-management/lending-transaction",
+          url: "/admin/sales-management/lending-transaction",
         },
       ],
     },
     {
       title: "Reports",
-      url: "/reports",
+      url: "/admin/reports",
       icon: IconReport,
     },
     {
       title: "Manajemen Pengguna",
-      url: "/users-management",
+      url: "/admin/users-management",
       icon: IconUsers,
       children: [
         {
           title: "Data Pengguna",
-          url: "/users-management",
+          url: "/admin/users-management",
         },
         {
           title: "Roles & Permissions",
-          url: "/users-management/roles-permissions",
+          url: "/admin/users-management/roles-permissions",
         },
       ],
     },
     {
       title: "Master",
-      url: "/master",
+      url: "/admin/master",
       icon: IconDatabase,
       children: [
         {
           title: "Sales Category",
-          url: "/sales-category",
+          url: "/admin/sales-category",
         },
       ],
     },
     {
       title: "Configuration System",
-      url: "/config-system",
+      url: "/admin/config-system",
       icon: IconSettingsCog,
-      children: [
-        {
-          title: "Parameter Biaya",
-          url: "/config-system/param-fee",
-        },
-        {
-          title: "Optimasi Rute",
-          url: "/config-system/optimation-rute",
-        },
-      ],
     },
   ],
   navSecondary: [
     {
       title: "Settings",
-      url: "/setting",
+      url: "/admin/setting",
       icon: IconSettings,
     },
   ],

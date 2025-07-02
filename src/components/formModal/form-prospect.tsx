@@ -11,7 +11,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Prospect } from "@/types/prospect";
-import { useGetTaskSchedulesQuery } from "@/services/coordinator/taskactivity.service";
 
 interface ProspectFormProps {
   form: Partial<Prospect>;
@@ -28,9 +27,6 @@ export default function ProspectForm({
 }: ProspectFormProps) {
   const isEdit = !!form.id;
 
-  const { data: taskScheduleData = { data: [] }, isLoading } =
-    useGetTaskSchedulesQuery({ page: 1, paginate: 1000 });
-
   return (
     <div className="bg-white dark:bg-zinc-900 rounded-lg p-6 w-full max-w-md space-y-4">
       <div className="flex justify-between items-center">
@@ -44,27 +40,27 @@ export default function ProspectForm({
 
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-y-1">
-          <Label>Task Schedule</Label>
-          <select
+          <Label>Task Schedule ID</Label>
+          <Input
+            type="number"
             value={form.task_schedule_id ?? ""}
             onChange={(e) =>
-              setForm({
-                ...form,
-                task_schedule_id: Number(e.target.value),
-              })
+              setForm({ ...form, task_schedule_id: Number(e.target.value) })
             }
-            className="border rounded-md px-3 py-2 text-sm bg-white dark:bg-zinc-800"
-            disabled={isLoading}
-          >
-            <option value="">Pilih Task Schedule</option>
-            {taskScheduleData.data.map((task) => (
-              <option key={task.id} value={task.id}>
-                {`[${task.id}] ${task.customer_first_name} ${
-                  task.customer_last_name
-                } - ${new Date(task.scheduled_at).toLocaleString("id-ID")}`}
-              </option>
-            ))}
-          </select>
+            placeholder="Masukkan ID Jadwal Tugas"
+          />
+        </div>
+
+        <div className="flex flex-col gap-y-1">
+          <Label>Assignment ID</Label>
+          <Input
+            type="number"
+            value={form.assignment_id ?? ""}
+            onChange={(e) =>
+              setForm({ ...form, assignment_id: Number(e.target.value) })
+            }
+            placeholder="Masukkan ID Penugasan"
+          />
         </div>
 
         <div className="flex flex-col gap-y-1">
@@ -73,7 +69,7 @@ export default function ProspectForm({
             type="text"
             value={form.product_type ?? ""}
             onChange={(e) => setForm({ ...form, product_type: e.target.value })}
-            placeholder="Contoh: FundingProduct atau LendingProduct"
+            placeholder="Contoh: App\\Models\\Product\\FundingProduct"
           />
         </div>
 

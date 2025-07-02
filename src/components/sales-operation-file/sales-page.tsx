@@ -13,8 +13,6 @@ import {
 import { Sales } from "@/types/sales";
 import SalesForm from "../formModal/form-sales";
 import useModal from "@/hooks/use-modal";
-import Swal from "sweetalert2";
-import "sweetalert2/dist/sweetalert2.min.css";
 
 export default function SalesPage() {
   const [page, setPage] = useState(1);
@@ -33,10 +31,8 @@ export default function SalesPage() {
     try {
       if (editingId !== null) {
         await updateSales({ id: editingId, payload: newSales });
-        Swal.fire("Berhasil", "Data sales berhasil diperbarui!", "success");
       } else {
         await createSales(newSales);
-        Swal.fire("Berhasil", "Data sales berhasil ditambahkan!", "success");
       }
       setNewSales({});
       setEditingId(null);
@@ -44,7 +40,6 @@ export default function SalesPage() {
       refetch();
     } catch (err) {
       console.error("Gagal menyimpan data sales:", err);
-      Swal.fire("Gagal", "Terjadi kesalahan saat menyimpan data.", "error");
     }
   };
 
@@ -55,24 +50,12 @@ export default function SalesPage() {
   };
 
   const handleDelete = async (salesId: number) => {
-    const result = await Swal.fire({
-      title: "Yakin ingin menghapus?",
-      text: "Data sales yang dihapus tidak dapat dikembalikan!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Ya, hapus!",
-      cancelButtonText: "Batal",
-    });
-
-    if (result.isConfirmed) {
-      try {
-        await deleteSales(salesId);
-        refetch();
-        Swal.fire("Dihapus!", "Data sales berhasil dihapus.", "success");
-      } catch (err) {
-        console.error("Gagal menghapus sales:", err);
-        Swal.fire("Gagal", "Terjadi kesalahan saat menghapus data.", "error");
-      }
+    if (!confirm("Yakin ingin menghapus sales ini?")) return;
+    try {
+      await deleteSales(salesId);
+      refetch();
+    } catch (err) {
+      console.error("Gagal menghapus sales:", err);
     }
   };
 
@@ -126,7 +109,7 @@ export default function SalesPage() {
             <tbody>
               {isLoading ? (
                 <tr>
-                  <td colSpan={8} className="text-center p-4 animate-pulse">
+                  <td colSpan={4} className="text-center p-4 animate-pulse">
                     Memuat data...
                   </td>
                 </tr>

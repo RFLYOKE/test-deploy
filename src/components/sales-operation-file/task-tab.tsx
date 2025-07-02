@@ -13,7 +13,6 @@ import {
 import { TaskSchedule } from "@/types/taskactivity";
 import useModal from "@/hooks/use-modal";
 import TaskActivityForm from "@/components/formModal/form-task-activity";
-import Swal from "sweetalert2";
 
 export default function TaskActivityPage() {
   const [page, setPage] = useState(1);
@@ -36,10 +35,8 @@ export default function TaskActivityPage() {
     try {
       if (editingId !== null) {
         await updateTaskSchedule({ id: editingId, payload: form });
-        Swal.fire("Berhasil!", "Task berhasil diperbarui.", "success");
       } else {
         await createTaskSchedule(form);
-        Swal.fire("Berhasil!", "Task berhasil ditambahkan.", "success");
       }
       setForm({});
       setEditingId(null);
@@ -47,9 +44,8 @@ export default function TaskActivityPage() {
       refetch();
     } catch (err) {
       console.error("Gagal menyimpan task schedule:", err);
-      Swal.fire("Gagal!", "Terjadi kesalahan saat menyimpan data.", "error");
     }
-  };  
+  };
 
   const handleEdit = (item: TaskSchedule) => {
     setForm(item);
@@ -58,28 +54,14 @@ export default function TaskActivityPage() {
   };
 
   const handleDelete = async (id: number) => {
-    const result = await Swal.fire({
-      title: "Yakin ingin menghapus?",
-      text: "Data yang dihapus tidak dapat dikembalikan.",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Ya, hapus!",
-      cancelButtonText: "Batal",
-    });
-
-    if (result.isConfirmed) {
-      try {
-        await deleteTaskSchedule(id);
-        refetch();
-        Swal.fire("Berhasil!", "Task berhasil dihapus.", "success");
-      } catch (err) {
-        console.error("Gagal menghapus task schedule:", err);
-        Swal.fire("Gagal!", "Terjadi kesalahan saat menghapus data.", "error");
-      }
+    if (!confirm("Yakin ingin menghapus task schedule ini?")) return;
+    try {
+      await deleteTaskSchedule(id);
+      refetch();
+    } catch (err) {
+      console.error("Gagal menghapus task schedule:", err);
     }
-  };  
+  };
 
   const taskSchedules = data?.data ?? [];
   const lastPage = data?.last_page ?? 1;
@@ -117,7 +99,6 @@ export default function TaskActivityPage() {
             <thead className="bg-muted text-left">
               <tr>
                 <th className="px-4 py-2 font-medium">No</th>
-                <th className="px-4 py-2 font-medium">ID Task Activity</th>
                 <th className="px-4 py-2 font-medium">Assignment ID</th>
                 <th className="px-4 py-2 font-medium">Scheduled At</th>
                 <th className="px-4 py-2 font-medium">Customer ID</th>
@@ -135,7 +116,7 @@ export default function TaskActivityPage() {
             <tbody>
               {isLoading ? (
                 <tr>
-                  <td colSpan={13} className="text-center p-4 animate-pulse">
+                  <td colSpan={5} className="text-center p-4 animate-pulse">
                     Memuat data...
                   </td>
                 </tr>
@@ -151,7 +132,6 @@ export default function TaskActivityPage() {
                     <td className="px-4 py-2">
                       {(page - 1) * perPage + idx + 1}
                     </td>
-                    <td className="px-4 py-2">{item.id}</td>
                     <td className="px-4 py-2">{item.assignment_id}</td>
                     <td className="px-4 py-2">
                       {new Date(item.scheduled_at).toLocaleString("id-ID", {

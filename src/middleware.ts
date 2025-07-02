@@ -26,7 +26,7 @@ export async function middleware(req: NextRequest) {
     const role = token.role as string;
 
     const redirectTo = {
-      admin: "/dashboard",
+      admin: "/admin/dashboard",
       koordinator: "/koordinator/dashboard",
       sales: "/sales/dashboard",
     }[role];
@@ -42,5 +42,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/:path*", "/koordinator/:path*", "/sales/:path*", "/"],
+  matcher: ["/admin/:path*", "/koordinator/:path*", "/sales/:path*", "/"],
 };
