@@ -9,8 +9,8 @@ import {
   useCreateProspectMutation,
   useUpdateProspectMutation,
   useDeleteProspectMutation,
-  useApproveProspectMutation,
-  useRejectProspectMutation,
+  // useApproveProspectMutation,
+  // useRejectProspectMutation,
 } from "@/services/coordinator/prospect.service";
 import useModal from "@/hooks/use-modal";
 import ProspectForm from "@/components/formModal/form-prospect";
@@ -29,8 +29,8 @@ export default function ProspectAssignmentPage() {
   const [createProspect] = useCreateProspectMutation();
   const [updateProspect] = useUpdateProspectMutation();
   const [deleteProspect] = useDeleteProspectMutation();
-  const [approveProspect] = useApproveProspectMutation();
-  const [rejectProspect] = useRejectProspectMutation();
+  // const [approveProspect] = useApproveProspectMutation();
+  // const [rejectProspect] = useRejectProspectMutation();
 
   const [newProspect, setNewProspect] = useState<Partial<Prospect>>({});
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -67,23 +67,23 @@ export default function ProspectAssignmentPage() {
     }
   };
 
-  const handleApprove = async (id: number) => {
-    try {
-      await approveProspect(id);
-      refetch();
-    } catch (err) {
-      console.error("Gagal menyetujui prospek:", err);
-    }
-  };
+  // const handleApprove = async (id: number) => {
+  //   try {
+  //     await approveProspect(id);
+  //     refetch();
+  //   } catch (err) {
+  //     console.error("Gagal menyetujui prospek:", err);
+  //   }
+  // };
 
-  const handleReject = async (id: number) => {
-    try {
-      await rejectProspect(id);
-      refetch();
-    } catch (err) {
-      console.error("Gagal menolak prospek:", err);
-    }
-  };
+  // const handleReject = async (id: number) => {
+  //   try {
+  //     await rejectProspect(id);
+  //     refetch();
+  //   } catch (err) {
+  //     console.error("Gagal menolak prospek:", err);
+  //   }
+  // };
 
   const prospectData = data?.data ?? [];
   const lastPage = data?.last_page ?? 1;
@@ -200,7 +200,7 @@ export default function ProspectAssignmentPage() {
                       >
                         Edit
                       </Button>
-                      <Button
+                      {/* <Button
                         size="sm"
                         variant="outline"
                         onClick={() => handleApprove(item.id)}
@@ -213,7 +213,7 @@ export default function ProspectAssignmentPage() {
                         onClick={() => handleReject(item.id)}
                       >
                         Reject
-                      </Button>
+                      </Button> */}
                       <Button
                         size="sm"
                         variant="destructive"
