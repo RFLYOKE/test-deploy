@@ -4,13 +4,18 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Assignment } from "@/types/assignment";
+import { useGetCustomersQuery } from "@/services/customer.service";
+import {
+  useGetAllCoordinatorsQuery,
+  useGetSalesByCoordinatorIdQuery,
+} from "@/services/reference.service";
 
 interface AssignmentFormProps {
   form: Partial<Assignment>;
   setForm: (form: Partial<Assignment>) => void;
   onCancel: () => void;
   onSubmit: () => void;
-  isLoading?: boolean; // Tambahkan prop ini
+  isLoading?: boolean;
 }
 
 export default function AssignmentForm({
@@ -18,9 +23,26 @@ export default function AssignmentForm({
   setForm,
   onCancel,
   onSubmit,
-  isLoading = false, // Default false
+  isLoading = false,
 }: AssignmentFormProps) {
   const isEdit = !!form.id;
+
+  // ✅ Get data
+  const { data: customerResponse, isLoading: loadingCustomers } =
+    useGetCustomersQuery({
+      page: 1,
+      paginate: 1000,
+    });
+
+  const customers = customerResponse?.data ?? [];
+
+  const { data: coordinators = [], isLoading: loadingCoordinators } =
+    useGetAllCoordinatorsQuery();
+
+  const { data: sales = [], isLoading: loadingSales } =
+    useGetSalesByCoordinatorIdQuery(form.coordinator_id!, {
+      skip: !form.coordinator_id,
+    });
 
   return (
     <div className="bg-white dark:bg-zinc-900 rounded-lg p-6 w-full max-w-md space-y-4">
@@ -34,39 +56,68 @@ export default function AssignmentForm({
       </div>
 
       <div className="flex flex-col gap-4">
+        {/* Customer Select */}
         <div className="flex flex-col gap-y-1">
-          <Label>Customer ID</Label>
-          <Input
-            type="number"
+          <Label>Customer</Label>
+          <select
             value={form.customer_id ?? ""}
             onChange={(e) =>
               setForm({ ...form, customer_id: Number(e.target.value) })
             }
-            placeholder="Masukkan ID Customer"
-          />
+            disabled={loadingCustomers}
+            className="border rounded-md px-3 py-2 text-sm bg-white dark:bg-zinc-800"
+          >
+            <option value="">Pilih Customer</option>
+            {customers.map((customer) => (
+              <option key={customer.id} value={customer.id}>
+                {customer.first_name} {customer.last_name} ({customer.email})
+              </option>
+            ))}
+          </select>
         </div>
+
+        {/* Coordinator Select */}
         <div className="flex flex-col gap-y-1">
-          <Label>Coordinator ID</Label>
-          <Input
-            type="number"
+          <Label>Koordinator</Label>
+          <select
             value={form.coordinator_id ?? ""}
-            onChange={(e) =>
-              setForm({ ...form, coordinator_id: Number(e.target.value) })
-            }
-            placeholder="Masukkan ID Koordinator"
-          />
+            onChange={(e) => {
+              const id = Number(e.target.value);
+              setForm({ ...form, coordinator_id: id, sales_id: undefined });
+            }}
+            disabled={loadingCoordinators}
+            className="border rounded-md px-3 py-2 text-sm bg-white dark:bg-zinc-800"
+          >
+            <option value="">Pilih Koordinator</option>
+            {coordinators.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name} ({c.email})
+              </option>
+            ))}
+          </select>
         </div>
+
+        {/* Sales Select */}
         <div className="flex flex-col gap-y-1">
-          <Label>Sales ID</Label>
-          <Input
-            type="number"
+          <Label>Sales</Label>
+          <select
             value={form.sales_id ?? ""}
             onChange={(e) =>
               setForm({ ...form, sales_id: Number(e.target.value) })
             }
-            placeholder="Masukkan ID Sales"
-          />
+            disabled={loadingSales || !form.coordinator_id}
+            className="border rounded-md px-3 py-2 text-sm bg-white dark:bg-zinc-800"
+          >
+            <option value="">Pilih Sales</option>
+            {sales.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.name} ({s.email})
+              </option>
+            ))}
+          </select>
         </div>
+
+        {/* Assignment Date */}
         <div className="flex flex-col gap-y-1">
           <Label>Tanggal Penugasan</Label>
           <Input
@@ -77,6 +128,8 @@ export default function AssignmentForm({
             }
           />
         </div>
+
+        {/* Status */}
         <div className="flex flex-col gap-y-1">
           <Label>Status</Label>
           <select
