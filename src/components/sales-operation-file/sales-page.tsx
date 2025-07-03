@@ -114,10 +114,8 @@ export default function SalesPage() {
             <thead className="bg-muted text-left">
               <tr>
                 <th className="px-4 py-2 font-medium">No</th>
-                <th className="px-4 py-2 font-medium">Sales ID</th>
                 <th className="px-4 py-2 font-medium">Nama Sales</th>
                 <th className="px-4 py-2 font-medium">Email Sales</th>
-                <th className="px-4 py-2 font-medium">Koordinator ID</th>
                 <th className="px-4 py-2 font-medium">Nama koordinator</th>
                 <th className="px-4 py-2 font-medium">Email koordinator</th>
                 <th className="px-4 py-2 font-medium">Aksi</th>
@@ -145,10 +143,8 @@ export default function SalesPage() {
                     <td className="px-4 py-2">
                       {(page - 1) * perPage + idx + 1}
                     </td>
-                    <td className="px-4 py-2">{item.sales_id}</td>
                     <td className="px-4 py-2">{item.sales_name}</td>
                     <td className="px-4 py-2">{item.sales_email}</td>
-                    <td className="px-4 py-2">{item.coordinator_id}</td>
                     <td className="px-4 py-2">{item.coordinator_name}</td>
                     <td className="px-4 py-2">{item.coordinator_email}</td>
                     <td className="px-4 py-2 space-x-2">

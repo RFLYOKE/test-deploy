@@ -117,15 +117,10 @@ export default function TaskActivityPage() {
             <thead className="bg-muted text-left">
               <tr>
                 <th className="px-4 py-2 font-medium">No</th>
-                <th className="px-4 py-2 font-medium">ID Task Activity</th>
-                <th className="px-4 py-2 font-medium">Assignment ID</th>
                 <th className="px-4 py-2 font-medium">Scheduled At</th>
-                <th className="px-4 py-2 font-medium">Customer ID</th>
                 <th className="px-4 py-2 font-medium">Nama Customer</th>
-                <th className="px-4 py-2 font-medium">Sales ID</th>
                 <th className="px-4 py-2 font-medium">Nama Sales</th>
                 <th className="px-4 py-2 font-medium">Email Sales</th>
-                <th className="px-4 py-2 font-medium">Koordinator ID</th>
                 <th className="px-4 py-2 font-medium">Nama koordinator</th>
                 <th className="px-4 py-2 font-medium">Email koordinator</th>
                 <th className="px-4 py-2 font-medium">Status</th>
@@ -151,22 +146,17 @@ export default function TaskActivityPage() {
                     <td className="px-4 py-2">
                       {(page - 1) * perPage + idx + 1}
                     </td>
-                    <td className="px-4 py-2">{item.id}</td>
-                    <td className="px-4 py-2">{item.assignment_id}</td>
                     <td className="px-4 py-2">
                       {new Date(item.scheduled_at).toLocaleString("id-ID", {
                         dateStyle: "medium",
                         timeStyle: "short",
                       })}
                     </td>
-                    <td className="px-4 py-2">{item.customer_id}</td>
                     <td className="px-4 py-2">
                       {`${item.customer_first_name} ${item.customer_last_name}`}
                     </td>
-                    <td className="px-4 py-2">{item.sales_id}</td>
                     <td className="px-4 py-2">{item.sales_name}</td>
                     <td className="px-4 py-2">{item.sales_email}</td>
-                    <td className="px-4 py-2">{item.coordinator_id}</td>
                     <td className="px-4 py-2">{item.coordinator_name}</td>
                     <td className="px-4 py-2">{item.coordinator_email}</td>
 

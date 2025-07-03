@@ -10,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea"; // pastikan kamu ekspor komponen ini
 import { Prospect } from "@/types/prospect";
 import { useGetTaskSchedulesQuery } from "@/services/coordinator/taskactivity.service";
 
@@ -47,12 +48,17 @@ export default function ProspectForm({
           <Label>Task Schedule</Label>
           <select
             value={form.task_schedule_id ?? ""}
-            onChange={(e) =>
+            onChange={(e) => {
+              const selectedTask = taskScheduleData.data.find(
+                (t) => t.id === Number(e.target.value)
+              );
+
               setForm({
                 ...form,
                 task_schedule_id: Number(e.target.value),
-              })
-            }
+                assignment_id: selectedTask?.assignment_id ?? 0,
+              });
+            }}
             className="border rounded-md px-3 py-2 text-sm bg-white dark:bg-zinc-800"
             disabled={isLoading}
           >
@@ -69,12 +75,31 @@ export default function ProspectForm({
 
         <div className="flex flex-col gap-y-1">
           <Label>Product Type</Label>
-          <Input
-            type="text"
+          <Select
             value={form.product_type ?? ""}
-            onChange={(e) => setForm({ ...form, product_type: e.target.value })}
-            placeholder="Contoh: FundingProduct atau LendingProduct"
-          />
+            onValueChange={(value) => {
+              const defaultProductId =
+                value === "App\\Models\\Product\\FundingProduct" ? 1 : 2;
+
+              setForm({
+                ...form,
+                product_type: value,
+                product_id: defaultProductId,
+              });
+            }}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Pilih jenis produk" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="App\Models\Product\FundingProduct">
+                Funding Product
+              </SelectItem>
+              <SelectItem value="App\Models\Product\LendingProduct">
+                Lending Product
+              </SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         <div className="flex flex-col gap-y-1">
@@ -82,17 +107,14 @@ export default function ProspectForm({
           <Input
             type="number"
             value={form.product_id ?? ""}
-            onChange={(e) =>
-              setForm({ ...form, product_id: Number(e.target.value) })
-            }
-            placeholder="Masukkan ID Produk"
+            disabled
+            placeholder="Product ID akan terisi otomatis"
           />
         </div>
 
         <div className="flex flex-col gap-y-1">
           <Label>Deskripsi</Label>
-          <Input
-            type="text"
+          <Textarea
             value={form.description ?? ""}
             onChange={(e) => setForm({ ...form, description: e.target.value })}
             placeholder="Masukkan catatan atau komentar"

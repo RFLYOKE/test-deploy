@@ -8,13 +8,7 @@ import {
   useGetAllCoordinatorsQuery,
   useGetUnassignedSalesQuery,
 } from "@/services/reference.service";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"; // dari ShadCN
+import { Combobox } from "@/components/ui/combo-box";
 
 interface SalesFormProps {
   form: Partial<Sales>;
@@ -30,18 +24,28 @@ export default function SalesForm({
   onSubmit,
 }: SalesFormProps) {
   const [isEdit] = useState(!!form.sales_id);
+  const [salesSearch, setSalesSearch] = useState("");
+  const [coordinatorSearch, setCoordinatorSearch] = useState("");
 
   const {
-    data: coordinators = [],
-    isLoading: loadingCoordinators,
-    isError: errorCoordinators,
-  } = useGetAllCoordinatorsQuery();
-
-  const {
-    data: unassignedSales = [],
+    data: salesData = [],
     isLoading: loadingSales,
     isError: errorSales,
-  } = useGetUnassignedSalesQuery();
+  } = useGetUnassignedSalesQuery(
+    salesSearch.length >= 2
+      ? { search: salesSearch, paginate: 10 }
+      : { search: "", paginate: 10 }
+  );
+
+  const {
+    data: coordinatorData = [],
+    isLoading: loadingCoordinators,
+    isError: errorCoordinators,
+  } = useGetAllCoordinatorsQuery(
+    coordinatorSearch.length >= 2
+      ? { search: coordinatorSearch, paginate: 10 }
+      : { search: "", paginate: 10 }
+  );
 
   return (
     <div className="bg-white dark:bg-zinc-900 rounded-lg p-6 w-full max-w-md space-y-4">
@@ -55,62 +59,42 @@ export default function SalesForm({
       </div>
 
       <div className="flex flex-col gap-4">
-        {/* SALES SELECT */}
+        {/* SALES COMBOBOX */}
         <div className="flex flex-col gap-y-1">
           <Label>Sales</Label>
-          <Select
-            value={form.sales_id ? String(form.sales_id) : ""}
-            onValueChange={(value) =>
-              setForm({ ...form, sales_id: Number(value) })
-            }
-            disabled={loadingSales || errorSales}
-          >
-            <SelectTrigger className="w-full bg-white dark:bg-zinc-800">
-              <SelectValue placeholder="Pilih Sales" />
-            </SelectTrigger>
-            <SelectContent>
-              {unassignedSales.length > 0 ? (
-                unassignedSales.map((s) => (
-                  <SelectItem key={s.id} value={String(s.id)}>
-                    {s.name} ({s.email})
-                  </SelectItem>
-                ))
-              ) : (
-                <SelectItem disabled value="-">
-                  Tidak ada sales tersedia
-                </SelectItem>
-              )}
-            </SelectContent>
-          </Select>
+          <Combobox
+            value={form.sales_id ?? null}
+            onChange={(id) => setForm({ ...form, sales_id: id })}
+            onSearchChange={setSalesSearch}
+            data={salesData}
+            isLoading={loadingSales}
+            placeholder="Pilih Sales"
+            getOptionLabel={(s) => `${s.name} (${s.email})`}
+          />
+          {errorSales && (
+            <p className="text-red-500 text-sm mt-1">
+              Gagal memuat data sales.
+            </p>
+          )}
         </div>
 
-        {/* COORDINATOR SELECT */}
+        {/* COORDINATOR COMBOBOX */}
         <div className="flex flex-col gap-y-1">
           <Label>Koordinator</Label>
-          <Select
-            value={form.coordinator_id ? String(form.coordinator_id) : ""}
-            onValueChange={(value) =>
-              setForm({ ...form, coordinator_id: Number(value) })
-            }
-            disabled={loadingCoordinators || errorCoordinators}
-          >
-            <SelectTrigger className="w-full bg-white dark:bg-zinc-800">
-              <SelectValue placeholder="Pilih Koordinator" />
-            </SelectTrigger>
-            <SelectContent>
-              {coordinators.length > 0 ? (
-                coordinators.map((c) => (
-                  <SelectItem key={c.id} value={String(c.id)}>
-                    {c.name} ({c.email})
-                  </SelectItem>
-                ))
-              ) : (
-                <SelectItem disabled value="-">
-                  Tidak ada sales tersedia
-                </SelectItem>
-              )}
-            </SelectContent>
-          </Select>
+          <Combobox
+            value={form.coordinator_id ?? null}
+            onChange={(id) => setForm({ ...form, coordinator_id: id })}
+            onSearchChange={setCoordinatorSearch}
+            data={coordinatorData}
+            isLoading={loadingCoordinators}
+            placeholder="Pilih Koordinator"
+            getOptionLabel={(c) => `${c.name} (${c.email})`}
+          />
+          {errorCoordinators && (
+            <p className="text-red-500 text-sm mt-1">
+              Gagal memuat data koordinator.
+            </p>
+          )}
         </div>
       </div>
 

@@ -4,9 +4,12 @@ import { Assignment } from "@/types/assignment";
 
 export const referenceApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getAllCoordinators: builder.query<User[], void>({
-      query: () => ({
-        url: "/reference/user/coordinator",
+    getAllCoordinators: builder.query<
+      User[],
+      { search: string; paginate: number }
+    >({
+      query: ({ search, paginate }) => ({
+        url: `/reference/user/coordinator?search=${search}&paginate=${paginate}`,
         method: "GET",
       }),
       transformResponse: (response: {
@@ -28,9 +31,12 @@ export const referenceApi = apiSlice.injectEndpoints({
       }) => response.data.data,
     }),
 
-    getUnassignedSales: builder.query<User[], void>({
-      query: () => ({
-        url: "/reference/user/sales/not-assigned",
+    getUnassignedSales: builder.query<
+      User[],
+      { search: string; paginate: number }
+    >({
+      query: ({ search, paginate }) => ({
+        url: `/reference/user/sales/not-assigned?search=${search}&paginate=${paginate}`,
         method: "GET",
       }),
       transformResponse: (response: {
@@ -40,10 +46,17 @@ export const referenceApi = apiSlice.injectEndpoints({
       }) => response.data.data,
     }),
 
-    getSalesByCoordinatorId: builder.query<User[], number>({
-      query: (id) => ({
+    // ✅ PERBAIKAN: Tambah dukungan pencarian
+    getSalesByCoordinatorId: builder.query<
+      User[],
+      { id: number; search?: string }
+    >({
+      query: ({ id, search }) => ({
         url: `/reference/user/coordinator/${id}/sales`,
         method: "GET",
+        params: {
+          search: search || "",
+        },
       }),
       transformResponse: (response: {
         code: number;
@@ -52,7 +65,6 @@ export const referenceApi = apiSlice.injectEndpoints({
       }) => response.data.data,
     }),
 
-    // ✅ New: Get All Assignments for Coordinator
     getCoordinatorAssignments: builder.query<Assignment[], void>({
       query: () => ({
         url: "/coordinator/assignments",
@@ -72,5 +84,5 @@ export const {
   useGetAllSalesQuery,
   useGetUnassignedSalesQuery,
   useGetSalesByCoordinatorIdQuery,
-  useGetCoordinatorAssignmentsQuery, 
+  useGetCoordinatorAssignmentsQuery,
 } = referenceApi;

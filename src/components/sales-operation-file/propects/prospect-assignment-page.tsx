@@ -15,6 +15,7 @@ import {
 import useModal from "@/hooks/use-modal";
 import ProspectForm from "@/components/formModal/form-prospect";
 import { Prospect } from "@/types/prospect";
+import Swal from "sweetalert2";
 
 export default function ProspectAssignmentPage() {
   const [page, setPage] = useState(1);
@@ -37,19 +38,58 @@ export default function ProspectAssignmentPage() {
 
   const handleSubmit = async () => {
     try {
+      let response;
+
       if (editingId !== null) {
-        await updateProspect({ id: editingId, payload: newProspect });
+        response = await updateProspect({
+          id: editingId,
+          payload: newProspect,
+        });
       } else {
-        await createProspect(newProspect);
+        response = await createProspect(newProspect);
       }
+
+      // Cek jika ada error dari response
+      if ("error" in response) {
+        const error = response.error;
+
+        if (
+          typeof error === "object" &&
+          error !== null &&
+          "data" in error &&
+          typeof error.data === "object"
+        ) {
+          const errData = error.data as { message?: string };
+          Swal.fire(
+            "Gagal",
+            errData.message || "Terjadi kesalahan validasi.",
+            "error"
+          );
+        } else {
+          Swal.fire("Gagal", "Terjadi kesalahan saat menyimpan data.", "error");
+        }
+
+        return; // hentikan proses jika error
+      }
+
+      // Jika tidak error, tampilkan berhasil
+      Swal.fire(
+        "Berhasil",
+        editingId !== null
+          ? "Prospek berhasil diperbarui."
+          : "Prospek berhasil ditambahkan.",
+        "success"
+      );
+
       setNewProspect({});
       setEditingId(null);
       closeModal();
       refetch();
     } catch (err) {
       console.error("Gagal menyimpan data:", err);
+      Swal.fire("Gagal", "Terjadi kesalahan sistem.", "error");
     }
-  };
+  };    
 
   const handleEdit = (prospect: Prospect) => {
     setNewProspect(prospect);
@@ -58,14 +98,28 @@ export default function ProspectAssignmentPage() {
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm("Yakin ingin menghapus prospek ini?")) return;
+    const result = await Swal.fire({
+      title: "Yakin ingin menghapus?",
+      text: "Data prospek yang dihapus tidak dapat dikembalikan!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Ya, hapus!",
+      cancelButtonText: "Batal",
+    });
+
+    if (!result.isConfirmed) return;
+
     try {
       await deleteProspect(id);
+      Swal.fire("Berhasil", "Prospek berhasil dihapus.", "success");
       refetch();
     } catch (err) {
       console.error("Gagal menghapus prospek:", err);
+      Swal.fire("Gagal", "Terjadi kesalahan saat menghapus data.", "error");
     }
-  };
+  };  
 
   // const handleApprove = async (id: number) => {
   //   try {
@@ -162,7 +216,6 @@ export default function ProspectAssignmentPage() {
             <thead className="bg-muted text-left">
               <tr>
                 <th className="px-4 py-2 font-medium">No</th>
-                <th className="px-4 py-2 font-medium">ID</th>
                 <th className="px-4 py-2 font-medium">Produk</th>
                 <th className="px-4 py-2 font-medium">Deskripsi</th>
                 <th className="px-4 py-2 font-medium">Status</th>
@@ -188,8 +241,18 @@ export default function ProspectAssignmentPage() {
                     <td className="px-4 py-2">
                       {(page - 1) * perPage + idx + 1}
                     </td>
-                    <td className="px-4 py-2">{item.id}</td>
-                    <td className="px-4 py-2">{item.product_type}</td>
+                    <td className="px-4 py-2">
+                      {item.product_type ===
+                        "App\\Models\\Product\\FundingProduct" ||
+                      item.product_type === "AppModelsProductFundingProduct"
+                        ? "Funding Product"
+                        : item.product_type ===
+                            "App\\Models\\Product\\LendingProduct" ||
+                          item.product_type === "AppModelsProductLendingProduct"
+                        ? "Lending Product"
+                        : "-"}
+                    </td>
+
                     <td className="px-4 py-2">{item.description}</td>
                     <td className="px-4 py-2">{renderStatus(item.status)}</td>
                     <td className="px-4 py-2 space-x-2 space-y-1">
