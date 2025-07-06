@@ -29,6 +29,7 @@ export default function RolePage() {
   const [roleName, setRoleName] = useState("");
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
   const [localPermissions, setLocalPermissions] = useState<string[]>([]);
+  const [isPermissionProcessing, setIsPermissionProcessing] = useState(false);
   const {
     data: permissionsData = [],
   } = useGetPermissionsByRoleQuery(selectedRole?.id ?? skipToken, {
@@ -148,6 +149,7 @@ export default function RolePage() {
   // Improved toggle permission logic
   const togglePermission = async (perm: string, isCurrentlyActive: boolean) => {
     if (!selectedRole) return;
+    setIsPermissionProcessing(true);
 
     try {
       if (isCurrentlyActive) {
@@ -157,7 +159,6 @@ export default function RolePage() {
         }).unwrap();
 
         setLocalPermissions((prev) => prev.filter((p) => p !== perm));
-
         Swal.fire("Berhasil", "Permission berhasil dinonaktifkan", "success");
       } else {
         await addPermissionToRole({
@@ -166,17 +167,19 @@ export default function RolePage() {
         }).unwrap();
 
         setLocalPermissions((prev) => [...prev, perm]);
-
         Swal.fire("Berhasil", "Permission berhasil diaktifkan", "success");
       }
     } catch (err) {
       console.error("Permission toggle failed:", err);
       Swal.fire("Gagal", "Terjadi kesalahan saat mengubah permission", "error");
+    } finally {
+      setIsPermissionProcessing(false);
     }
-  };  
+  };   
   
   const handleCheckAll = async () => {
     if (!selectedRole) return;
+    setIsPermissionProcessing(true);
 
     try {
       const allPermissionsPossible = Object.entries(groupedPermissions).flatMap(
@@ -197,9 +200,7 @@ export default function RolePage() {
           )
         );
 
-        // ✅ Update local state
         setLocalPermissions((prev) => [...prev, ...permissionsToAdd]);
-
         Swal.fire("Berhasil", "Semua permission telah diaktifkan", "success");
       } else {
         Swal.fire("Info", "Semua permission sudah aktif", "info");
@@ -211,12 +212,15 @@ export default function RolePage() {
         "Terjadi kesalahan saat mengaktifkan semua permission",
         "error"
       );
+    } finally {
+      setIsPermissionProcessing(false);
     }
-  };  
-
+  };
+    
   // Fixed uncheck all permissions
   const handleUncheckAll = async () => {
     if (!selectedRole) return;
+    setIsPermissionProcessing(true);
 
     try {
       if (localPermissions.length > 0) {
@@ -229,9 +233,7 @@ export default function RolePage() {
           )
         );
 
-        // ✅ Kosongkan local state
         setLocalPermissions([]);
-
         Swal.fire(
           "Berhasil",
           "Semua permission telah dinonaktifkan",
@@ -247,8 +249,11 @@ export default function RolePage() {
         "Terjadi kesalahan saat menonaktifkan semua permission",
         "error"
       );
+    } finally {
+      setIsPermissionProcessing(false);
     }
   };
+  
   
   return (
     <main className="p-6 w-full mx-auto">
@@ -389,11 +394,16 @@ export default function RolePage() {
               <Button
                 onClick={handleCheckAll}
                 className="bg-blue-500 hover:bg-blue-600 text-white"
+                disabled={isPermissionProcessing}
               >
                 ✅ Check All
               </Button>
 
-              <Button onClick={handleUncheckAll} variant="destructive">
+              <Button
+                onClick={handleUncheckAll}
+                variant="destructive"
+                disabled={isPermissionProcessing}
+              >
                 ❌ Uncheck All
               </Button>
             </div>
@@ -419,6 +429,7 @@ export default function RolePage() {
                               type="button"
                               role="switch"
                               aria-checked={isActive}
+                              disabled={isPermissionProcessing}
                               onClick={() =>
                                 togglePermission(permKey, isActive)
                               }
