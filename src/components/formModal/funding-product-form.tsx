@@ -105,7 +105,7 @@ export default function FundingProductForm({
           <Label>Status</Label>
           <select
             className="border rounded-md px-3 py-2 text-sm bg-white dark:bg-zinc-800"
-            value={form.status ? "false" : "true"}
+            value={form.status ? "true" : "false"}
             onChange={(e) =>
               setForm({ ...form, status: e.target.value === "true" })
             }

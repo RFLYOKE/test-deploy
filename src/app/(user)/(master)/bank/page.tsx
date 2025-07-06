@@ -1,13 +1,13 @@
-import SalesCategoryPage from "@/components/master/sales-category";
+import BankPage from "@/components/master/bank-page";
 import { SiteHeader } from "@/components/site-header";
 
 export default function Page() {
   return (
     <>
-      <SiteHeader title="Sales Category" />
+      <SiteHeader title="Bank" />
       <div className="flex flex-1 flex-col">
         <div className="w-full">
-          <SalesCategoryPage />
+            <BankPage/>
         </div>
       </div>
     </>

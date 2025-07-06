@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   useCreateUserMutation,
   useUpdateUserMutation,
@@ -11,7 +11,7 @@ import Swal from "sweetalert2";
 interface FormCreateUserProps {
   onClose: () => void;
   onSuccess: () => void;
-  initialData?: User; // ✅ sudah pakai User, bukan any
+  initialData?: User;
 }
 
 export default function FormCreateUser({
@@ -36,36 +36,27 @@ export default function FormCreateUser({
 
   const isLoading = creating || updating;
 
+  // ✅ FIX LOOP: Gunakan useEffect hanya saat initialData dan roles siap
   useEffect(() => {
-    if (isEdit && initialData) {
-      const selectedRole = roles.find(
-        (r) => r.id === initialData.role_id
-      )?.name;
+    if (!initialData || roles.length === 0) return;
 
-      setForm({
-        name: initialData.name || "",
-        email: initialData.email || "",
-        phone: initialData.phone || "",
-        role: selectedRole || "sales",
-        password: "",
-        password_confirmation: "",
-      });
-    } else {
-      setForm({
-        name: "",
-        email: "",
-        phone: "",
-        role: "sales",
-        password: "",
-        password_confirmation: "",
-      });
-    }
-  }, [isEdit, initialData, roles]);
-  
+    const selectedRole =
+      roles.find((r) => r.id === initialData.role_id)?.name || "sales";
 
-  const roleNameToId: Record<string, number> = Object.fromEntries(
-    roles.map((r: Role) => [r.name, r.id])
-  );
+    setForm({
+      name: initialData.name || "",
+      email: initialData.email || "",
+      phone: initialData.phone || "",
+      role: selectedRole,
+      password: "",
+      password_confirmation: "",
+    });
+  }, [initialData, roles]);
+
+  // ✅ Gunakan useMemo agar mapping stabil
+  const roleNameToId = useMemo(() => {
+    return Object.fromEntries(roles.map((r: Role) => [r.name, r.id]));
+  }, [roles]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -131,8 +122,7 @@ export default function FormCreateUser({
         await Swal.fire("Gagal", "Terjadi kesalahan", "error");
       }
     }
-  };  
-  
+  };
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">

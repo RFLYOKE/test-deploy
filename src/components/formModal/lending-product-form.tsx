@@ -122,7 +122,7 @@ export default function LendingProductForm({
           <label>Status</label>
           <select
             className="border rounded-md px-3 py-2 text-sm bg-white dark:bg-zinc-800"
-            value={form.status ? "0" : "1"}
+            value={form.status ? "1" : "0"}
             onChange={(e) =>
               setForm({ ...form, status: e.target.value === "1" })
             }

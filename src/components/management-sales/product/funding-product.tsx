@@ -15,9 +15,12 @@ import {
   useGetFundingProductsQuery,
   useUpdateFundingProductMutation,
 } from "@/services/product-services/fundingproduct.service";
+import Swal from "sweetalert2";
 
 export default function FundingProductPage() {
-  const [newProduct, setNewProduct] = useState<Partial<FundingProduct>>({});
+  const [newProduct, setNewProduct] = useState<Partial<FundingProduct>>({
+    status: true,
+  });
   const [editingProductId, setEditingProductId] = useState<number | null>(null);
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState<"semua" | "aktif" | "tidak">(
@@ -49,8 +52,10 @@ export default function FundingProductPage() {
     try {
       if (editingProductId !== null) {
         await updateProduct({ id: editingProductId, payload });
+        Swal.fire("Berhasil!", "Produk berhasil diperbarui.", "success");
       } else {
         await createProduct(payload);
+        Swal.fire("Berhasil!", "Produk berhasil ditambahkan.", "success");
       }
       setNewProduct({});
       setEditingProductId(null);
@@ -58,8 +63,9 @@ export default function FundingProductPage() {
       refetch();
     } catch (err) {
       console.error("Gagal simpan produk:", err);
+      Swal.fire("Gagal!", "Terjadi kesalahan saat menyimpan produk.", "error");
     }
-  };
+  };  
 
   const handleEdit = (product: FundingProduct) => {
     setNewProduct({
@@ -72,16 +78,28 @@ export default function FundingProductPage() {
   };
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm("Apakah Anda yakin ingin menghapus produk ini?"))
-      return;
+    const result = await Swal.fire({
+      title: "Hapus Produk?",
+      text: "Produk yang dihapus tidak dapat dikembalikan!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#6c757d",
+      confirmButtonText: "Ya, hapus!",
+      cancelButtonText: "Batal",
+    });
+
+    if (!result.isConfirmed) return;
 
     try {
       await deleteProduct(id);
-      refetch();
+      await refetch();
+      Swal.fire("Terhapus!", "Produk berhasil dihapus.", "success");
     } catch (err) {
       console.error("Gagal hapus produk:", err);
+      Swal.fire("Gagal!", "Terjadi kesalahan saat menghapus produk.", "error");
     }
-  };
+  };  
 
   const toggleStatus = async (id: number, currentStatus: boolean) => {
     try {
@@ -96,7 +114,6 @@ export default function FundingProductPage() {
     const value = e.target.value as "semua" | "aktif" | "tidak";
     setFilterStatus(value);
   };
-  
 
   const products = data?.data || [];
   const lastPage = data?.last_page || 1;
@@ -135,7 +152,7 @@ export default function FundingProductPage() {
 
           <Button
             onClick={() => {
-              setNewProduct({});
+              setNewProduct({ status: true });
               setEditingProductId(null);
               openModal();
             }}

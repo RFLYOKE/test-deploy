@@ -132,6 +132,22 @@ const data = {
           title: "Sales Category",
           url: "/sales-category",
         },
+        {
+          title: "Wilayah Kerja",
+          url: "/wilayah-kerja",
+        },
+        {
+          title: "Cabang",
+          url: "/cabang",
+        },
+        {
+          title: "Bank",
+          url: "/bank",
+        },
+        {
+          title: "Cabang Bank Mitra",
+          url: "/cabang-bank-mitra",
+        },
       ],
     },
     {

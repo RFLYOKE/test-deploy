@@ -1,11 +1,14 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   useGetRolesQuery,
   useDeleteRoleMutation,
   useCreateRoleMutation,
   useUpdateRoleMutation,
-} from "@/services/users.service"; // Sesuaikan path jika berbeda
+  useGetPermissionsByRoleQuery,
+  useAddPermissionToRoleMutation,
+  useRevokePermissionFromRoleMutation,
+} from "@/services/users.service";
 import useModal from "@/hooks/use-modal";
 import {
   DropdownMenu,
@@ -15,16 +18,47 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { IconDotsVertical } from "@tabler/icons-react";
 import { Role } from "@/types/user";
-import { Button } from "@/components/ui/button"; 
-import FormCreateRole from "@/components/formModal/form-create-role"; 
+import { Button } from "@/components/ui/button";
+import FormCreateRole from "@/components/formModal/form-create-role";
 import Swal from "sweetalert2";
+import { skipToken } from "@reduxjs/toolkit/query";
 
 export default function RolePage() {
   const [search, setSearch] = useState("");
   const [editingRole, setEditingRole] = useState<Role | undefined>(undefined);
-  const [roleName, setRoleName] = useState(""); // State untuk input nama peran di modal
+  const [roleName, setRoleName] = useState("");
+  const [selectedRole, setSelectedRole] = useState<Role | null>(null);
 
-  const { data: roles = [], isLoading, isError, refetch } = useGetRolesQuery(); // Mengambil semua peran
+  const { data: rolePermissions = [], refetch: refetchPermissions } =
+    useGetPermissionsByRoleQuery(selectedRole?.id ?? skipToken, {
+      skip: !selectedRole,
+    });
+
+    const groupedPermissions = useMemo(() => {
+      const groups: Record<string, string[]> = {};
+      rolePermissions.forEach((perm) => {
+        const [action, ...rest] = perm.split("-");
+        const route = rest.join("-");
+        if (!groups[route]) groups[route] = [];
+        if (!groups[route].includes(action)) {
+          groups[route].push(action);
+        }
+      });
+
+      Object.keys(groups).forEach((route) => {
+        ["view", "create", "update", "delete"].forEach((action) => {
+          if (!groups[route].includes(action)) {
+            groups[route].push(action);
+          }
+        });
+      });
+
+      return groups;
+    }, [rolePermissions]);    
+
+  const { data: roles = [], isLoading, isError, refetch } = useGetRolesQuery();
+  const [addPermissionToRole] = useAddPermissionToRoleMutation();
+  const [revokePermissionFromRole] = useRevokePermissionFromRoleMutation();
 
   const [deleteRole] = useDeleteRoleMutation();
   const [createRole, { isLoading: isCreating }] = useCreateRoleMutation();
@@ -35,7 +69,6 @@ export default function RolePage() {
     role.name.toLowerCase().includes(search.toLowerCase())
   );
 
-  // Mengisi form saat mode edit atau mereset saat mode tambah
   useEffect(() => {
     if (editingRole) {
       setRoleName(editingRole.name);
@@ -45,14 +78,14 @@ export default function RolePage() {
   }, [editingRole]);
 
   const handleAddRole = () => {
-    setEditingRole(undefined); // Reset untuk mode tambah
-    setRoleName(""); // Pastikan input kosong
+    setEditingRole(undefined);
+    setRoleName("");
     openModal();
   };
 
   const handleEdit = (role: Role) => {
     setEditingRole(role);
-    setRoleName(role.name); // Isi input dengan nama peran yang diedit
+    setRoleName(role.name);
     openModal();
   };
 
@@ -70,7 +103,7 @@ export default function RolePage() {
       try {
         await deleteRole(role.id).unwrap();
         await Swal.fire("Berhasil", "Peran berhasil dihapus", "success");
-        refetch(); // Memuat ulang data setelah penghapusan
+        refetch();
       } catch (err) {
         console.error("Gagal menghapus peran:", err);
         Swal.fire("Gagal", "Terjadi kesalahan saat menghapus peran", "error");
@@ -82,14 +115,12 @@ export default function RolePage() {
     e.preventDefault();
     try {
       if (editingRole) {
-        // Mode edit
         await updateRole({
           id: editingRole.id,
           payload: { name: roleName },
         }).unwrap();
         await Swal.fire("Berhasil", "Peran berhasil diperbarui", "success");
       } else {
-        // Mode tambah
         await createRole({ name: roleName }).unwrap();
         await Swal.fire("Berhasil", "Peran berhasil ditambahkan", "success");
       }
@@ -99,7 +130,31 @@ export default function RolePage() {
       console.error("Gagal menyimpan peran:", error);
       Swal.fire("Gagal", "Terjadi kesalahan saat menyimpan peran", "error");
     }
-  };  
+  };
+
+  const handleOpenPermissions = (role: Role) => {
+    setSelectedRole(role);
+  };
+
+  const togglePermission = async (perm: string, isChecked: boolean) => {
+    if (!selectedRole) return;
+    try {
+      if (isChecked) {
+        await revokePermissionFromRole({
+          role: selectedRole.id,
+          permission: perm,
+        }).unwrap();
+      } else {
+        await addPermissionToRole({
+          role: selectedRole.id,
+          permission: perm,
+        }).unwrap();
+      }
+      refetchPermissions();
+    } catch (err) {
+      console.error("Permission toggle failed:", err);
+    }
+  };
 
   return (
     <main className="p-6 w-full mx-auto">
@@ -187,11 +242,15 @@ export default function RolePage() {
                               </button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              {/* Tambahkan opsi dropdown lainnya jika diperlukan */}
                               <DropdownMenuItem
                                 onClick={() => handleEdit(role)}
                               >
                                 Detail/Edit
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => handleOpenPermissions(role)}
+                              >
+                                Lihat Permissions
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
@@ -216,6 +275,106 @@ export default function RolePage() {
             onSubmit={handleSubmitRole}
             isSubmitting={isCreating || isUpdating}
           />
+        </div>
+      )}
+
+      {selectedRole && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-neutral-800 p-6 rounded-lg w-[600px] max-h-[90vh] overflow-y-auto space-y-4">
+            <h3 className="text-lg font-semibold">
+              Role Permissions - {selectedRole.name}
+            </h3>
+
+            {/* Tombol Check All & Uncheck All */}
+            <div className="flex gap-2">
+              <Button
+                onClick={async () => {
+                  await Promise.all(
+                    Object.entries(groupedPermissions).flatMap(([route]) =>
+                      ["view", "create", "update", "delete"]
+                        .map((action) => {
+                          const permKey = `${action}-${route}`;
+                          if (!rolePermissions.includes(permKey)) {
+                            return addPermissionToRole({
+                              role: selectedRole.id,
+                              permission: permKey,
+                            });
+                          }
+                          return null;
+                        })
+                        .filter(Boolean)
+                    )
+                  );
+                  refetchPermissions();
+                }}
+              >
+                ✅ Check All
+              </Button>
+
+              <Button
+                variant="destructive"
+                onClick={async () => {
+                  await Promise.all(
+                    Object.entries(groupedPermissions).flatMap(([route]) =>
+                      ["view", "create", "update", "delete"]
+                        .map((action) => {
+                          const permKey = `${action}-${route}`;
+                          if (rolePermissions.includes(permKey)) {
+                            return revokePermissionFromRole({
+                              role: selectedRole.id,
+                              permission: permKey,
+                            });
+                          }
+                          return null;
+                        })
+                        .filter(Boolean)
+                    )
+                  );
+                  refetchPermissions();
+                }}
+              >
+                ❌ Uncheck All
+              </Button>
+            </div>
+
+            {/* List Route & Permission */}
+            {Object.keys(groupedPermissions).length === 0 ? (
+              <p className="text-muted-foreground">Belum ada permission.</p>
+            ) : (
+              Object.entries(groupedPermissions).map(([route]) => (
+                <div key={`route-${route}`} className="border-t pt-4">
+                  <p className="font-semibold text-sm mb-2">Route: {route}</p>
+                  <div className="flex flex-wrap gap-6">
+                    {["view", "create", "update", "delete"].map((action) => {
+                      const permKey = `${action}-${route}`;
+                      const isActive = rolePermissions.includes(permKey);
+                      return (
+                        <label
+                          key={`role-permission-${action}-${route}`}
+                          className="flex flex-col items-center gap-y-1"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={isActive}
+                            onChange={() => togglePermission(permKey, isActive)}
+                            className="sr-only peer"
+                          />
+                          <div className="peer w-10 h-8 bg-black rounded-full relative after:content-[''] after:absolute after:bg-white after:w-6 after:h-6 after:rounded-full after:top-1 after:left-1 after:transition-transform peer-checked:after:translate-x-4" />
+                          <span className="text-sm capitalize">{action}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))
+            )}
+
+            <div className="text-right mt-4">
+              <Button variant="outline" onClick={() => setSelectedRole(null)}>
+                Tutup
+              </Button>
+            </div>
+          </div>
         </div>
       )}
     </main>
