@@ -92,6 +92,13 @@ export default function BankPage() {
     return matchName && matchStatus;
   });
 
+  const limitWords = (text: string, maxWords = 7) => {
+    const words = text.split(" ");
+    return words.length > maxWords
+      ? words.slice(0, maxWords).join(" ") + "..."
+      : text;
+  }; 
+
   return (
     <div className="p-6 space-y-6">
       <h1 className="text-2xl font-bold">Bank</h1>
@@ -157,7 +164,7 @@ export default function BankPage() {
                       </td>
                       <td className="px-4 py-2">{b.code}</td>
                       <td className="px-4 py-2">{b.name}</td>
-                      <td className="px-4 py-2">{b.description}</td>
+                      <td className="px-4 py-2">{limitWords(b.description)}</td>
                       <td className="px-4 py-2">
                         <Badge variant={b.status ? "success" : "destructive"}>
                           {b.status ? "Aktif" : "Tidak Aktif"}

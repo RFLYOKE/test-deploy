@@ -14,11 +14,14 @@ import {
   useUpdateSalesCategoryMutation,
   useDeleteSalesCategoryMutation,
 } from "@/services/salescategory.service";
+import Swal from "sweetalert2"; 
 
 export default function SalesCategoryPage() {
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("semua");
-  const [form, setForm] = useState<Partial<SalesCategory>>({});
+  const [form, setForm] = useState<Partial<SalesCategory>>({
+    status: true,
+  });
   const [editingId, setEditingId] = useState<number | null>(null);
   const [page, setPage] = useState(1);
   const { isOpen, openModal, closeModal } = useModal();
@@ -42,8 +45,10 @@ export default function SalesCategoryPage() {
     try {
       if (editingId !== null) {
         await updateSalesCategory({ id: editingId, payload: form }).unwrap();
+        Swal.fire("Berhasil!", "Kategori berhasil diperbarui.", "success");
       } else {
         await createSalesCategory(form).unwrap();
+        Swal.fire("Berhasil!", "Kategori berhasil ditambahkan.", "success");
       }
       setForm({});
       setEditingId(null);
@@ -51,6 +56,7 @@ export default function SalesCategoryPage() {
       refetch();
     } catch (error) {
       console.error("Gagal simpan data:", error);
+      Swal.fire("Gagal!", "Terjadi kesalahan saat menyimpan data.", "error");
     }
   };
 
@@ -61,12 +67,25 @@ export default function SalesCategoryPage() {
   };
 
   const handleDelete = async (id: number) => {
-    if (confirm("Yakin ingin menghapus kategori ini?")) {
+    const result = await Swal.fire({
+      title: "Yakin ingin menghapus?",
+      text: "Data yang dihapus tidak dapat dikembalikan.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Ya, hapus!",
+      cancelButtonText: "Batal",
+    });
+
+    if (result.isConfirmed) {
       try {
         await deleteSalesCategory(id).unwrap();
         refetch();
+        Swal.fire("Berhasil!", "Kategori berhasil dihapus.", "success");
       } catch (error) {
         console.error("Gagal hapus kategori:", error);
+        Swal.fire("Gagal!", "Terjadi kesalahan saat menghapus data.", "error");
       }
     }
   };
@@ -104,7 +123,7 @@ export default function SalesCategoryPage() {
           </select>
           <Button
             onClick={() => {
-              setForm({});
+              setForm({status: true});
               setEditingId(null);
               openModal();
             }}
@@ -145,7 +164,12 @@ export default function SalesCategoryPage() {
                           {(page - 1) * 10 + index + 1}
                         </td>
                         <td className="px-4 py-2">{c.name}</td>
-                        <td className="px-4 py-2">{c.description}</td>
+                        <td className="px-4 py-2 whitespace-nowrap">
+                          {c.description.split(" ").length > 7
+                            ? c.description.split(" ").slice(0, 7).join(" ") +
+                              "..."
+                            : c.description}
+                        </td>
                         <td className="px-4 py-2">
                           <Badge variant={c.status ? "success" : "destructive"}>
                             {c.status ? "Aktif" : "Tidak Aktif"}

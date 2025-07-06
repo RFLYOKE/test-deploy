@@ -159,8 +159,10 @@ export default function LendingProductPage() {
                 <th className="px-4 py-2">No</th>
                 <th className="px-4 py-2">Nama</th>
                 <th className="px-4 py-2">Deskripsi</th>
-                <th className="px-4 py-2">Kisaran Pinjaman</th>
-                <th className="px-4 py-2">Suku Bunga</th>
+                <th className="px-4 py-2 whitespace-nowrap">
+                  Kisaran Pinjaman
+                </th>
+                <th className="px-4 py-2 whitespace-nowrap">Suku Bunga</th>
                 <th className="px-4 py-2">Ketentuan</th>
                 <th className="px-4 py-2">Kriteria</th>
                 <th className="px-4 py-2">Status</th>
@@ -192,9 +194,13 @@ export default function LendingProductPage() {
                     <td className="px-4 py-2">
                       {(page - 1) * paginate + index + 1}
                     </td>
-                    <td className="px-4 py-2">{p.name}</td>
-                    <td className="px-4 py-2">{p.description}</td>
-                    <td className="px-4 py-2">
+                    <td className="px-4 py-2 whitespace-nowrap">{p.name}</td>
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      {p.description.split(" ").length > 7
+                        ? p.description.split(" ").slice(0, 7).join(" ") + "..."
+                        : p.description}
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap">
                       {new Intl.NumberFormat("id-ID", {
                         style: "currency",
                         currency: "IDR",
@@ -208,9 +214,23 @@ export default function LendingProductPage() {
                       }).format(p.loan_amount_max)}
                     </td>
 
-                    <td className="px-4 py-2">{p.interest_rate}%</td>
-                    <td className="px-4 py-2">{p.repayment_terms}</td>
-                    <td className="px-4 py-2">{p.eligibility_criteria}</td>
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      {p.interest_rate}%
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      {p.repayment_terms.split(" ").length > 7
+                        ? p.repayment_terms.split(" ").slice(0, 7).join(" ") +
+                          "..."
+                        : p.repayment_terms}
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      {p.eligibility_criteria.split(" ").length > 7
+                        ? p.eligibility_criteria
+                            .split(" ")
+                            .slice(0, 7)
+                            .join(" ") + "..."
+                        : p.eligibility_criteria}
+                    </td>
                     <td className="px-4 py-2">
                       <Badge
                         variant={p.status ? "success" : "destructive"}

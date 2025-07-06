@@ -171,7 +171,9 @@ export default function FundingProductPage() {
                 <th className="px-4 py-2 font-medium">Nama</th>
                 <th className="px-4 py-2 font-medium">Deskripsi</th>
                 <th className="px-4 py-2 font-medium">Min-Max</th>
-                <th className="px-4 py-2 font-medium">Suku Bunga</th>
+                <th className="px-4 py-2 font-medium whitespace-nowrap">
+                  Suku Bunga
+                </th>
                 <th className="px-4 py-2 font-medium">Kriteria</th>
                 <th className="px-4 py-2 font-medium">Status</th>
                 <th className="px-4 py-2 font-medium">Aksi</th>
@@ -202,9 +204,16 @@ export default function FundingProductPage() {
                     <td className="px-4 py-2">
                       {(page - 1) * perPage + idx + 1}
                     </td>
-                    <td className="px-4 py-2">{product.name}</td>
-                    <td className="px-4 py-2">{product.description}</td>
-                    <td className="px-4 py-2">
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      {product.name}
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      {product.description.split(" ").length > 7
+                        ? product.description.split(" ").slice(0, 7).join(" ") +
+                          "..."
+                        : product.description}
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap">
                       {new Intl.NumberFormat("id-ID", {
                         style: "currency",
                         currency: "IDR",
@@ -217,9 +226,16 @@ export default function FundingProductPage() {
                         minimumFractionDigits: 0,
                       }).format(product.maximum_amount)}
                     </td>
-                    <td className="px-4 py-2">{product.interest_rate}%</td>
-                    <td className="px-4 py-2">
-                      {product.eligibility_criteria}
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      {product.interest_rate}%
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      {product.eligibility_criteria.split(" ").length > 7
+                        ? product.eligibility_criteria
+                            .split(" ")
+                            .slice(0, 7)
+                            .join(" ") + "..."
+                        : product.eligibility_criteria}
                     </td>
                     <td className="px-4 py-2">
                       <Badge
@@ -231,20 +247,22 @@ export default function FundingProductPage() {
                       </Badge>
                     </td>
                     <td className="px-4 py-2 space-x-2">
-                      <Button
-                        size="sm"
-                        variant="secondary"
-                        onClick={() => handleEdit(product)}
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={() => handleDelete(product.id)}
-                      >
-                        Hapus
-                      </Button>
+                      <div className="flex gap-2 items-center">
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={() => handleEdit(product)}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => handleDelete(product.id)}
+                        >
+                          Hapus
+                        </Button>
+                      </div>
                     </td>
                   </tr>
                 ))

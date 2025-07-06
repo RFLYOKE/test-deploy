@@ -122,7 +122,7 @@ export default function CustomerPage() {
     <div className="p-6 space-y-6">
       <h1 className="text-2xl font-bold">Manajemen Pelanggan</h1>
 
-      <div className="flex flex-wrap items-center gap-2 justify-between max-w-5xl">
+      <div className="flex flex-wrap items-center gap-2 justify-between">
         <Input
           placeholder="Cari nama pelanggan..."
           value={search}
@@ -154,41 +154,47 @@ export default function CustomerPage() {
           <table className="w-full text-sm">
             <thead className="bg-muted text-left">
               <tr>
+                <th className="px-4 py-2">Aksi</th>
                 <th className="px-4 py-2">No</th>
-                <th className="px-4 py-2">Nama Lengkap</th>
+                <th className="px-4 py-2 whitespace-nowrap">Nama Lengkap</th>
                 <th className="px-4 py-2">Salutation</th>
                 <th className="px-4 py-2">Job Title</th>
                 <th className="px-4 py-2">Email</th>
                 <th className="px-4 py-2">Telepon</th>
                 <th className="px-4 py-2">Alamat</th>
-                <th className="px-4 py-2">Kode Pos</th>
+                <th className="px-4 py-2 whitespace-nowrap">Kode Pos</th>
                 <th className="px-4 py-2">Latitude</th>
                 <th className="px-4 py-2">Longitude</th>
-                <th className="px-4 py-2">Wilayah Kerja</th>
+                <th className="px-4 py-2 whitespace-nowrap">Wilayah Kerja</th>
                 <th className="px-4 py-2">Cabang</th>
                 <th className="px-4 py-2">Bank</th>
-                <th className="px-4 py-2">Cabang Bank Mitra</th>
+                <th className="px-4 py-2 whitespace-nowrap">
+                  Cabang Bank Mitra
+                </th>
                 <th className="px-4 py-2">Sales</th>
-                <th className="px-4 py-2">Tanggal Referensi</th>
-                <th className="px-4 py-2">Tanggal Cair</th>
+                <th className="px-4 py-2 whitespace-nowrap">
+                  Tanggal Referensi
+                </th>
+                <th className="px-4 py-2 whitespace-nowrap">Tanggal Cair</th>
                 <th className="px-4 py-2">CIF</th>
                 <th className="px-4 py-2">No Rekening</th>
                 <th className="px-4 py-2">Plafond</th>
-                <th className="px-4 py-2">Sisa Pinjaman</th>
-                <th className="px-4 py-2">Terima Bersih</th>
-                <th className="px-4 py-2">Jangka Waktu</th>
-                <th className="px-4 py-2">Jenis Pinjaman</th>
-                <th className="px-4 py-2">Jenis Produk</th>
-                <th className="px-4 py-2">Nama RM</th>
-                <th className="px-4 py-2">File Pencairan</th>
-                <th className="px-4 py-2">Customer Flag</th>
-                <th className="px-4 py-2">Attachment Form</th>
-                <th className="px-4 py-2">Attachment Form Flag</th>
+                <th className="px-4 py-2 whitespace-nowrap">Sisa Pinjaman</th>
+                <th className="px-4 py-2 whitespace-nowrap">Jangka Waktu</th>
+                <th className="px-4 py-2 whitespace-nowrap">Terima Bersih</th>
+                <th className="px-4 py-2 whitespace-nowrap">Jenis Pinjaman</th>
+                <th className="px-4 py-2 whitespace-nowrap">Jenis Produk</th>
+                <th className="px-4 py-2 whitespace-nowrap">Nama RM</th>
+                <th className="px-4 py-2 whitespace-nowrap">File Pencairan</th>
+                <th className="px-4 py-2 whitespace-nowrap">Customer Flag</th>
+                <th className="px-4 py-2 whitespace-nowrap">Attachment Form</th>
+                <th className="px-4 py-2 whitespace-nowrap">
+                  Attachment Form Flag
+                </th>
                 <th className="px-4 py-2">Mutasi</th>
-                <th className="px-4 py-2">File Mutasi</th>
-                <th className="px-4 py-2">Juru Bayar</th>
+                <th className="px-4 py-2 whitespace-nowrap">File Mutasi</th>
+                <th className="px-4 py-2 whitespace-nowrap">Juru Bayar</th>
                 <th className="px-4 py-2">Status</th>
-                <th className="px-4 py-2">Aksi</th>
               </tr>
             </thead>
             <tbody>
@@ -204,92 +210,6 @@ export default function CustomerPage() {
               ) : (
                 filtered.map((c, index) => (
                   <tr key={index} className="border-t">
-                    <td className="px-4 py-2">{(page - 1) * 10 + index + 1}</td>
-                    <td className="px-4 py-2">{`${c.first_name} ${c.last_name}`}</td>
-                    <td className="px-4 py-2">{c.salutation}</td>
-                    <td className="px-4 py-2">{c.job_title}</td>
-                    <td className="px-4 py-2">{c.email}</td>
-                    <td className="px-4 py-2">{c.phone}</td>
-                    <td className="px-4 py-2">{c.address}</td>
-                    <td className="px-4 py-2">{c.postal_code}</td>
-                    <td className="px-4 py-2">{c.latitude}</td>
-                    <td className="px-4 py-2">{c.longitude}</td>
-                    <td className="px-4 py-2">{c.wilayah_kerja_name}</td>
-                    <td className="px-4 py-2">{c.cabang_name}</td>
-                    <td className="px-4 py-2">{c.bank_name}</td>
-                    <td className="px-4 py-2">{c.cabang_bank_mitra_name}</td>
-                    <td className="px-4 py-2">{c.sales_name}</td>
-                    <td className="px-4 py-2">{c.reference_date}</td>
-                    <td className="px-4 py-2">{c.disbursement_date}</td>
-                    <td className="px-4 py-2">{c.cif}</td>
-                    <td className="px-4 py-2">{c.loan_account_number}</td>
-                    <td className="px-4 py-2">
-                      Rp{c.plafond?.toLocaleString()}
-                    </td>
-                    <td className="px-4 py-2">
-                      Rp{c.remaining_loan?.toLocaleString()}
-                    </td>
-                    <td className="px-4 py-2">
-                      Rp{c.net_receipt?.toLocaleString()}
-                    </td>
-                    <td className="px-4 py-2">{c.time_period} bulan</td>
-                    <td className="px-4 py-2">{c.loan_type}</td>
-                    <td className="px-4 py-2">{c.loan_product}</td>
-                    <td className="px-4 py-2">{c.rm_name}</td>
-                    <td className="px-4 py-2">
-                      {getFileURL(c.disbursement_files) ? (
-                        <a
-                          href={getFileURL(c.disbursement_files)}
-                          target="_blank"
-                          className="text-blue-500 underline"
-                        >
-                          View File
-                        </a>
-                      ) : (
-                        "-"
-                      )}
-                    </td>
-                    <td className="px-4 py-2">
-                      {c.customer_file_flag ? "Yes" : "No"}
-                    </td>
-                    <td className="px-4 py-2">
-                      {getFileURL(c.attacthment_form) ? (
-                        <a
-                          href={getFileURL(c.attacthment_form)}
-                          target="_blank"
-                          className="text-blue-500 underline"
-                        >
-                          View File
-                        </a>
-                      ) : (
-                        "-"
-                      )}
-                    </td>
-                    <td className="px-4 py-2">
-                      {c.attachment_form_flag ? "Yes" : "No"}
-                    </td>
-                    <td className="px-4 py-2">
-                      {c.mutation_flag ? "Yes" : "No"}
-                    </td>
-                    <td className="px-4 py-2">
-                      {getFileURL(c.mutation_files) ? (
-                        <a
-                          href={getFileURL(c.mutation_files)}
-                          target="_blank"
-                          className="text-blue-500 underline"
-                        >
-                          View File
-                        </a>
-                      ) : (
-                        "-"
-                      )}
-                    </td>
-                    <td className="px-4 py-2">{c.payrol}</td>
-                    <td className="px-4 py-2">
-                      <Badge variant={c.status ? "success" : "destructive"}>
-                        {c.status ? "Aktif" : "Tidak Aktif"}
-                      </Badge>
-                    </td>
                     <td className="px-4 py-2">
                       <div className="flex items-center space-x-2">
                         <Button
@@ -307,6 +227,134 @@ export default function CustomerPage() {
                           Delete
                         </Button>
                       </div>
+                    </td>
+                    <td className="px-4 py-2">{(page - 1) * 10 + index + 1}</td>
+                    <td className="px-4 py-2 whitespace-nowrap">{`${c.first_name} ${c.last_name}`}</td>
+                    <td className="px-4 py-2">{c.salutation}</td>
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      {c.job_title}
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap">{c.email}</td>
+                    <td className="px-4 py-2 whitespace-nowrap">{c.phone}</td>
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      {c.address
+                        ? c.address.split(" ").slice(0, 6).join(" ") +
+                          (c.address.split(" ").length > 6 ? "..." : "")
+                        : "-"}
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      {c.postal_code}
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      {c.latitude}
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      {c.longitude}
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      {c.wilayah_kerja_name}
+                    </td>
+                    <td className="px-4 py- whitespace-nowrap">
+                      {c.cabang_name}
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      {c.bank_name}
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      {c.cabang_bank_mitra_name}
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      {c.sales_name}
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      {c.reference_date
+                        ? new Date(c.reference_date).toLocaleDateString("id-ID")
+                        : "-"}
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      {c.disbursement_date
+                        ? new Date(c.disbursement_date).toLocaleDateString(
+                            "id-ID"
+                          )
+                        : "-"}
+                    </td>
+
+                    <td className="px-4 py-2 whitespace-nowrap">{c.cif}</td>
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      {c.loan_account_number}
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      Rp{c.plafond?.toLocaleString()}
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      Rp{c.remaining_loan?.toLocaleString()}
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      Rp{c.net_receipt?.toLocaleString()}
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      {c.time_period} bulan
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      {c.loan_type}
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      {c.loan_product}
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap">{c.rm_name}</td>
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      {getFileURL(c.disbursement_files) ? (
+                        <a
+                          href={getFileURL(c.disbursement_files)}
+                          target="_blank"
+                          className="text-blue-500 underline"
+                        >
+                          View File
+                        </a>
+                      ) : (
+                        "-"
+                      )}
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      {c.customer_file_flag ? "Yes" : "No"}
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      {getFileURL(c.attacthment_form) ? (
+                        <a
+                          href={getFileURL(c.attacthment_form)}
+                          target="_blank"
+                          className="text-blue-500 underline"
+                        >
+                          View File
+                        </a>
+                      ) : (
+                        "-"
+                      )}
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      {c.attachment_form_flag ? "Yes" : "No"}
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      {c.mutation_flag ? "Yes" : "No"}
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      {getFileURL(c.mutation_files) ? (
+                        <a
+                          href={getFileURL(c.mutation_files)}
+                          target="_blank"
+                          className="text-blue-500 underline"
+                        >
+                          View File
+                        </a>
+                      ) : (
+                        "-"
+                      )}
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap">{c.payrol}</td>
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      <Badge variant={c.status ? "success" : "destructive"}>
+                        {c.status ? "Aktif" : "Tidak Aktif"}
+                      </Badge>
                     </td>
                   </tr>
                 ))

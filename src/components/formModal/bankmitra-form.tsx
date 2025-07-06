@@ -10,6 +10,7 @@ import { useGetBranchesQuery } from "@/services/cabang.service";
 import { useGetBanksQuery } from "@/services/bank.service";
 import { Branch } from "@/types/branch";
 import { Bank } from "@/types/bank";
+import { Textarea } from "../ui/textarea";
 
 interface BankMitraFormProps {
   form: Partial<CabangBankMitra>;
@@ -80,7 +81,7 @@ export default function BankMitraForm({
         {/* Deskripsi */}
         <div className="flex flex-col gap-y-1">
           <Label>Deskripsi</Label>
-          <Input
+          <Textarea
             value={form.description ?? ""}
             onChange={(e) => setForm({ ...form, description: e.target.value })}
           />

@@ -1,6 +1,8 @@
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { LendingProduct } from "@/types/sales-manage";
+import { Label } from "../ui/label";
+import { Textarea } from "../ui/textarea";
 
 interface Props {
   form: Partial<LendingProduct>;
@@ -48,10 +50,9 @@ export default function LendingProductForm({
             onChange={(e) => setForm({ ...form, name: e.target.value })}
           />
         </div>
-
         <div className="flex flex-col gap-y-1">
-          <label>Deskripsi</label>
-          <Input
+          <Label>Deskripsi</Label>
+          <Textarea
             value={form.description || ""}
             onChange={(e) => setForm({ ...form, description: e.target.value })}
           />

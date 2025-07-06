@@ -183,7 +183,7 @@ export const usersApi = apiSlice.injectEndpoints({
     // ✅ 12. addPermissionToRole
     addPermissionToRole: builder.mutation<
       { code: number; message: string },
-      { role: number | string; permission: string }
+      { role: number | string; permission: string[] }
     >({
       query: ({ role, permission }) => ({
         url: `/role/${role}/permissions/add`,
@@ -200,7 +200,7 @@ export const usersApi = apiSlice.injectEndpoints({
     // ✅ 13. revokePermissionFromRole
     revokePermissionFromRole: builder.mutation<
       { code: number; message: string },
-      { role: number | string; permission: string }
+      { role: number | string; permission: string[] }
     >({
       query: ({ role, permission }) => ({
         url: `/role/${role}/permissions/revoke`,

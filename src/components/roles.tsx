@@ -28,33 +28,42 @@ export default function RolePage() {
   const [editingRole, setEditingRole] = useState<Role | undefined>(undefined);
   const [roleName, setRoleName] = useState("");
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
+  const [localPermissions, setLocalPermissions] = useState<string[]>([]);
+  const {
+    data: permissionsData = [],
+  } = useGetPermissionsByRoleQuery(selectedRole?.id ?? skipToken, {
+    skip: !selectedRole,
+  });
 
-  const { data: rolePermissions = [], refetch: refetchPermissions } =
-    useGetPermissionsByRoleQuery(selectedRole?.id ?? skipToken, {
-      skip: !selectedRole,
+  useEffect(() => {
+    if (selectedRole && permissionsData.length > 0) {
+      setLocalPermissions(permissionsData);
+    }
+  }, [permissionsData, selectedRole]);  
+  
+  const groupedPermissions = useMemo(() => {
+    const groups: Record<string, string[]> = {};
+    const routes = new Set<string>();
+    permissionsData.forEach((perm) => {
+      const [...rest] = perm.split("-");
+      const route = rest.join("-");
+      routes.add(route);
     });
-
-    const groupedPermissions = useMemo(() => {
-      const groups: Record<string, string[]> = {};
-      rolePermissions.forEach((perm) => {
-        const [action, ...rest] = perm.split("-");
-        const route = rest.join("-");
-        if (!groups[route]) groups[route] = [];
-        if (!groups[route].includes(action)) {
-          groups[route].push(action);
-        }
+    routes.forEach((route) => {
+      groups[route] = ["view", "create", "update", "delete"];
+    });
+    if (routes.size === 0 && selectedRole) {
+      const defaultRoutes = [
+        "pulse",
+        "api.v1.callback.midtrans",
+        "api.v1.welcome",
+      ];
+      defaultRoutes.forEach((route) => {
+        groups[route] = ["view", "create", "update", "delete"];
       });
-
-      Object.keys(groups).forEach((route) => {
-        ["view", "create", "update", "delete"].forEach((action) => {
-          if (!groups[route].includes(action)) {
-            groups[route].push(action);
-          }
-        });
-      });
-
-      return groups;
-    }, [rolePermissions]);    
+    }
+    return groups;
+  }, [permissionsData, selectedRole]);  
 
   const { data: roles = [], isLoading, isError, refetch } = useGetRolesQuery();
   const [addPermissionToRole] = useAddPermissionToRoleMutation();
@@ -136,26 +145,111 @@ export default function RolePage() {
     setSelectedRole(role);
   };
 
-  const togglePermission = async (perm: string, isChecked: boolean) => {
+  // Improved toggle permission logic
+  const togglePermission = async (perm: string, isCurrentlyActive: boolean) => {
     if (!selectedRole) return;
+
     try {
-      if (isChecked) {
+      if (isCurrentlyActive) {
         await revokePermissionFromRole({
           role: selectedRole.id,
-          permission: perm,
+          permission: [perm],
         }).unwrap();
+
+        setLocalPermissions((prev) => prev.filter((p) => p !== perm));
+
+        Swal.fire("Berhasil", "Permission berhasil dinonaktifkan", "success");
       } else {
         await addPermissionToRole({
           role: selectedRole.id,
-          permission: perm,
+          permission: [perm],
         }).unwrap();
+
+        setLocalPermissions((prev) => [...prev, perm]);
+
+        Swal.fire("Berhasil", "Permission berhasil diaktifkan", "success");
       }
-      refetchPermissions();
     } catch (err) {
       console.error("Permission toggle failed:", err);
+      Swal.fire("Gagal", "Terjadi kesalahan saat mengubah permission", "error");
+    }
+  };  
+  
+  const handleCheckAll = async () => {
+    if (!selectedRole) return;
+
+    try {
+      const allPermissionsPossible = Object.entries(groupedPermissions).flatMap(
+        ([route, actions]) => actions.map((action) => `${action}-${route}`)
+      );
+
+      const permissionsToAdd = allPermissionsPossible.filter(
+        (perm) => !localPermissions.includes(perm)
+      );
+
+      if (permissionsToAdd.length > 0) {
+        await Promise.all(
+          permissionsToAdd.map((perm) =>
+            addPermissionToRole({
+              role: selectedRole.id,
+              permission: [perm],
+            }).unwrap()
+          )
+        );
+
+        // ✅ Update local state
+        setLocalPermissions((prev) => [...prev, ...permissionsToAdd]);
+
+        Swal.fire("Berhasil", "Semua permission telah diaktifkan", "success");
+      } else {
+        Swal.fire("Info", "Semua permission sudah aktif", "info");
+      }
+    } catch (err) {
+      console.error("Check all failed:", err);
+      Swal.fire(
+        "Gagal",
+        "Terjadi kesalahan saat mengaktifkan semua permission",
+        "error"
+      );
+    }
+  };  
+
+  // Fixed uncheck all permissions
+  const handleUncheckAll = async () => {
+    if (!selectedRole) return;
+
+    try {
+      if (localPermissions.length > 0) {
+        await Promise.all(
+          localPermissions.map((perm) =>
+            revokePermissionFromRole({
+              role: selectedRole.id,
+              permission: [perm],
+            }).unwrap()
+          )
+        );
+
+        // ✅ Kosongkan local state
+        setLocalPermissions([]);
+
+        Swal.fire(
+          "Berhasil",
+          "Semua permission telah dinonaktifkan",
+          "success"
+        );
+      } else {
+        Swal.fire("Info", "Tidak ada permission aktif", "info");
+      }
+    } catch (err) {
+      console.error("Uncheck all failed:", err);
+      Swal.fire(
+        "Gagal",
+        "Terjadi kesalahan saat menonaktifkan semua permission",
+        "error"
+      );
     }
   };
-
+  
   return (
     <main className="p-6 w-full mx-auto">
       <section className="space-y-4">
@@ -211,7 +305,10 @@ export default function RolePage() {
                 <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                   {filteredRoles.length === 0 ? (
                     <tr>
-                      <td className="px-4 py-4 text-center text-gray-500 dark:text-gray-400">
+                      <td
+                        colSpan={3}
+                        className="px-4 py-4 text-center text-gray-500 dark:text-gray-400"
+                      >
                         Tidak ada peran yang ditemukan.
                       </td>
                     </tr>
@@ -279,95 +376,75 @@ export default function RolePage() {
       )}
 
       {selectedRole && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div
+          key={selectedRole.id}
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+        >
           <div className="bg-white dark:bg-neutral-800 p-6 rounded-lg w-[600px] max-h-[90vh] overflow-y-auto space-y-4">
             <h3 className="text-lg font-semibold">
               Role Permissions - {selectedRole.name}
             </h3>
 
-            {/* Tombol Check All & Uncheck All */}
             <div className="flex gap-2">
               <Button
-                onClick={async () => {
-                  await Promise.all(
-                    Object.entries(groupedPermissions).flatMap(([route]) =>
-                      ["view", "create", "update", "delete"]
-                        .map((action) => {
-                          const permKey = `${action}-${route}`;
-                          if (!rolePermissions.includes(permKey)) {
-                            return addPermissionToRole({
-                              role: selectedRole.id,
-                              permission: permKey,
-                            });
-                          }
-                          return null;
-                        })
-                        .filter(Boolean)
-                    )
-                  );
-                  refetchPermissions();
-                }}
+                onClick={handleCheckAll}
+                className="bg-blue-500 hover:bg-blue-600 text-white"
               >
                 ✅ Check All
               </Button>
 
-              <Button
-                variant="destructive"
-                onClick={async () => {
-                  await Promise.all(
-                    Object.entries(groupedPermissions).flatMap(([route]) =>
-                      ["view", "create", "update", "delete"]
-                        .map((action) => {
-                          const permKey = `${action}-${route}`;
-                          if (rolePermissions.includes(permKey)) {
-                            return revokePermissionFromRole({
-                              role: selectedRole.id,
-                              permission: permKey,
-                            });
-                          }
-                          return null;
-                        })
-                        .filter(Boolean)
-                    )
-                  );
-                  refetchPermissions();
-                }}
-              >
+              <Button onClick={handleUncheckAll} variant="destructive">
                 ❌ Uncheck All
               </Button>
             </div>
 
-            {/* List Route & Permission */}
-            {Object.keys(groupedPermissions).length === 0 ? (
-              <p className="text-muted-foreground">Belum ada permission.</p>
-            ) : (
-              Object.entries(groupedPermissions).map(([route]) => (
-                <div key={`route-${route}`} className="border-t pt-4">
-                  <p className="font-semibold text-sm mb-2">Route: {route}</p>
-                  <div className="flex flex-wrap gap-6">
-                    {["view", "create", "update", "delete"].map((action) => {
-                      const permKey = `${action}-${route}`;
-                      const isActive = rolePermissions.includes(permKey);
-                      return (
-                        <label
-                          key={`role-permission-${action}-${route}`}
-                          className="flex flex-col items-center gap-y-1"
-                        >
-                          <input
-                            type="checkbox"
-                            checked={isActive}
-                            onChange={() => togglePermission(permKey, isActive)}
-                            className="sr-only peer"
-                          />
-                          <div className="peer w-10 h-8 bg-black rounded-full relative after:content-[''] after:absolute after:bg-white after:w-6 after:h-6 after:rounded-full after:top-1 after:left-1 after:transition-transform peer-checked:after:translate-x-4" />
-                          <span className="text-sm capitalize">{action}</span>
-                        </label>
-                      );
-                    })}
+            <div className="max-h-80 overflow-y-auto">
+              {Object.keys(groupedPermissions).length === 0 ? (
+                <p className="text-muted-foreground">Belum ada permission.</p>
+              ) : (
+                Object.entries(groupedPermissions).map(([route, actions]) => (
+                  <div key={`route-${route}`} className="border-t pt-4">
+                    <p className="font-semibold text-sm mb-2">Route: {route}</p>
+                    <div className="flex flex-wrap gap-6">
+                      {actions.map((action) => {
+                        const permKey = `${action}-${route}`;
+                        const isActive = localPermissions.includes(permKey);
+
+                        return (
+                          <div
+                            key={`role-permission-${action}-${route}`}
+                            className="flex flex-col items-center gap-y-1"
+                          >
+                            <button
+                              type="button"
+                              role="switch"
+                              aria-checked={isActive}
+                              onClick={() =>
+                                togglePermission(permKey, isActive)
+                              }
+                              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 ${
+                                isActive
+                                  ? "bg-blue-500"
+                                  : "bg-gray-300 dark:bg-gray-600"
+                              }`}
+                            >
+                              <span
+                                className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform duration-300 ${
+                                  isActive ? "translate-x-5" : "translate-x-1"
+                                }`}
+                              />
+                            </button>
+                            <span className="text-sm capitalize mt-1">
+                              {action}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
-              ))
-            )}
+                ))
+              )}
+            </div>
 
             <div className="text-right mt-4">
               <Button variant="outline" onClick={() => setSelectedRole(null)}>

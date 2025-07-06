@@ -100,6 +100,13 @@ export default function CabangPage() {
     return matchName && matchStatus;
   });
 
+  const limitWords = (text: string, maxWords = 7) => {
+    const words = text.split(" ");
+    return words.length > maxWords
+      ? words.slice(0, maxWords).join(" ") + "..."
+      : text;
+  };  
+
   return (
     <div className="p-6 space-y-6">
       <h1 className="text-2xl font-bold">Cabang</h1>
@@ -165,7 +172,7 @@ export default function CabangPage() {
                       </td>
                       <td className="px-4 py-2">{c.code}</td>
                       <td className="px-4 py-2">{c.name}</td>
-                      <td className="px-4 py-2">{c.description}</td>
+                      <td className="px-4 py-2">{limitWords(c.description)}</td>
                       <td className="px-4 py-2">
                         <Badge variant={c.status ? "success" : "destructive"}>
                           {c.status ? "Aktif" : "Tidak Aktif"}
