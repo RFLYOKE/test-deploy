@@ -13,7 +13,7 @@ import {
   useCreateBranchMutation,
   useUpdateBranchMutation,
   useDeleteBranchMutation,
-} from "@/services/cabang.service";
+} from "@/services/master/cabang.service";
 import Swal from "sweetalert2";
 
 export default function CabangPage() {

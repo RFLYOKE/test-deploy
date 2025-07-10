@@ -13,7 +13,7 @@ import {
   useCreateSalesCategoryMutation,
   useUpdateSalesCategoryMutation,
   useDeleteSalesCategoryMutation,
-} from "@/services/salescategory.service";
+} from "@/services/master/salescategory.service";
 
 export default function JenisPinjamanPage() {
   const [search, setSearch] = useState("");

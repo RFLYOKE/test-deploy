@@ -8,16 +8,26 @@ import { Input } from "@/components/ui/input";
 import FundingProductForm from "@/components/formModal/funding-product-form";
 import useModal from "@/hooks/use-modal";
 import { FundingProduct } from "@/types/sales-manage";
-
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { IconDotsVertical } from "@tabler/icons-react";
 import {
   useCreateFundingProductMutation,
   useDeleteFundingProductMutation,
   useGetFundingProductsQuery,
   useUpdateFundingProductMutation,
 } from "@/services/product-services/fundingproduct.service";
+import { useGetFundingProductCategoriesQuery } from "@/services/product-services/fundingproductcategory.service";
 import Swal from "sweetalert2";
+import { useRouter } from "next/navigation";
 
 export default function FundingProductPage() {
+  const router = useRouter();
+
   const [newProduct, setNewProduct] = useState<Partial<FundingProduct>>({
     status: true,
   });
@@ -34,6 +44,11 @@ export default function FundingProductPage() {
     paginate: 10,
   });
 
+  const { data: categoriesData } = useGetFundingProductCategoriesQuery({
+    page: 1,
+    paginate: 1000,
+  });
+
   const [createProduct] = useCreateFundingProductMutation();
   const [updateProduct] = useUpdateFundingProductMutation();
   const [deleteProduct] = useDeleteFundingProductMutation();
@@ -47,6 +62,8 @@ export default function FundingProductPage() {
       interest_rate: Number(newProduct.interest_rate),
       eligibility_criteria: newProduct.eligibility_criteria ?? "",
       status: !!newProduct.status,
+      funding_product_category_id:
+        newProduct.funding_product_category_id ?? undefined,
     };
 
     try {
@@ -65,7 +82,7 @@ export default function FundingProductPage() {
       console.error("Gagal simpan produk:", err);
       Swal.fire("Gagal!", "Terjadi kesalahan saat menyimpan produk.", "error");
     }
-  };  
+  };
 
   const handleEdit = (product: FundingProduct) => {
     setNewProduct({
@@ -99,7 +116,7 @@ export default function FundingProductPage() {
       console.error("Gagal hapus produk:", err);
       Swal.fire("Gagal!", "Terjadi kesalahan saat menghapus produk.", "error");
     }
-  };  
+  };
 
   const toggleStatus = async (id: number, currentStatus: boolean) => {
     try {
@@ -128,9 +145,16 @@ export default function FundingProductPage() {
     return matchSearch && matchStatus;
   });
 
+  const limitWords = (text: string, maxWords = 7) => {
+    const words = text.split(" ");
+    return words.length > maxWords
+      ? words.slice(0, maxWords).join(" ") + "..."
+      : text;
+  }; 
+
   return (
     <div className="p-6 space-y-6">
-      <h1 className="text-2xl font-bold">Produk Pendanaan</h1>
+      <h1 className="text-2xl font-bold">Produk Funding</h1>
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <Input
@@ -175,6 +199,7 @@ export default function FundingProductPage() {
                   Suku Bunga
                 </th>
                 <th className="px-4 py-2 font-medium">Kriteria</th>
+                <th className="px-4 py-2 font-medium">Kategori</th>
                 <th className="px-4 py-2 font-medium">Status</th>
                 <th className="px-4 py-2 font-medium">Aksi</th>
               </tr>
@@ -183,7 +208,7 @@ export default function FundingProductPage() {
               {isLoading ? (
                 <tr>
                   <td
-                    colSpan={8}
+                    colSpan={9}
                     className="text-center p-4 text-muted-foreground animate-pulse"
                   >
                     Memuat data...
@@ -192,7 +217,7 @@ export default function FundingProductPage() {
               ) : filteredProducts.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={8}
+                    colSpan={9}
                     className="text-center p-4 text-muted-foreground"
                   >
                     Tidak ada produk yang cocok.
@@ -208,10 +233,7 @@ export default function FundingProductPage() {
                       {product.name}
                     </td>
                     <td className="px-4 py-2 whitespace-nowrap">
-                      {product.description.split(" ").length > 7
-                        ? product.description.split(" ").slice(0, 7).join(" ") +
-                          "..."
-                        : product.description}
+                      {limitWords(product.description)}
                     </td>
                     <td className="px-4 py-2 whitespace-nowrap">
                       {new Intl.NumberFormat("id-ID", {
@@ -237,6 +259,9 @@ export default function FundingProductPage() {
                             .join(" ") + "..."
                         : product.eligibility_criteria}
                     </td>
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      {product.category_name || "-"}
+                    </td>
                     <td className="px-4 py-2">
                       <Badge
                         variant={product.status ? "success" : "destructive"}
@@ -247,21 +272,39 @@ export default function FundingProductPage() {
                       </Badge>
                     </td>
                     <td className="px-4 py-2 space-x-2">
-                      <div className="flex gap-2 items-center">
+                      <div className="flex items-center gap-2">
                         <Button
                           size="sm"
-                          variant="secondary"
-                          onClick={() => handleEdit(product)}
+                          variant="default"
+                          onClick={() => router.push(`/sales-management/funding-product/target/${product.id}`)}
                         >
-                          Edit
+                          Target
                         </Button>
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => handleDelete(product.id)}
-                        >
-                          Hapus
-                        </Button>
+
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              className="w-8 h-8"
+                            >
+                              <IconDotsVertical className="w-4 h-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                              onClick={() => handleEdit(product)}
+                            >
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => handleDelete(product.id)}
+                              className="text-red-600 focus:text-red-600"
+                            >
+                              Hapus
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
                     </td>
                   </tr>
@@ -302,6 +345,7 @@ export default function FundingProductPage() {
             setForm={setNewProduct}
             onCancel={closeModal}
             onSubmit={handleSubmit}
+            categories={categoriesData?.data ?? []}
           />
         </div>
       )}

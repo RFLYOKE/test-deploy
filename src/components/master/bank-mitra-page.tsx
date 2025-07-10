@@ -13,7 +13,7 @@ import {
   useCreateCabangBankMitraMutation,
   useUpdateCabangBankMitraMutation,
   useDeleteCabangBankMitraMutation,
-} from "@/services/cabangbankmitra.service";
+} from "@/services/master/cabangbankmitra.service";
 import Swal from "sweetalert2";
 
 export default function BankMitraPage() {

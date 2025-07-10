@@ -1,98 +1,92 @@
 import { apiSlice } from "../base-query";
-import { FundingProduct } from "@/types/sales-manage";
+import { Bank } from "@/types/bank";
 
-export const fundingProductApi = apiSlice.injectEndpoints({
+export const bankApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    // ✅ Get all funding products
-    getFundingProducts: builder.query<
+    // ✅ Get all banks with pagination + search
+    getBanks: builder.query<
       {
-        data: FundingProduct[];
-        current_page: number;
+        data: Bank[];
         last_page: number;
+        current_page: number;
         total: number;
         per_page: number;
       },
-      { page: number; paginate: number; search?: string } // ✅ search optional
+      { page: number; paginate: number; search?: string } // <--- Tambahkan search
     >({
       query: ({ page, paginate, search = "" }) => ({
-        url: `/product/funding?paginate=${paginate}&search=${encodeURIComponent(
-          search
-        )}&page=${page}`,
+        url: `/master/bank`,
         method: "GET",
+        params: {
+          page,
+          paginate,
+          search,
+        },
       }),
       transformResponse: (response: {
         code: number;
         message: string;
         data: {
-          data: FundingProduct[];
           current_page: number;
+          data: Bank[];
           last_page: number;
           total: number;
           per_page: number;
         };
       }) => ({
         data: response.data.data,
-        current_page: response.data.current_page,
         last_page: response.data.last_page,
+        current_page: response.data.current_page,
         total: response.data.total,
         per_page: response.data.per_page,
       }),
     }),
 
-    // ✅ Get product by ID
-    getFundingProductById: builder.query<FundingProduct, number>({
+    // ✅ Get bank by ID
+    getBankById: builder.query<Bank, number>({
       query: (id) => ({
-        url: `/product/funding/${id}`,
+        url: `/master/bank/${id}`,
         method: "GET",
       }),
       transformResponse: (response: {
         code: number;
         message: string;
-        data: FundingProduct;
+        data: Bank;
       }) => response.data,
     }),
 
-    // ✅ Create new product
-    createFundingProduct: builder.mutation<
-      FundingProduct,
-      Partial<FundingProduct>
-    >({
+    // ✅ Create bank
+    createBank: builder.mutation<Bank, Partial<Bank>>({
       query: (payload) => ({
-        url: "/product/funding",
+        url: `/master/bank`,
         method: "POST",
         body: payload,
       }),
       transformResponse: (response: {
         code: number;
         message: string;
-        data: FundingProduct;
+        data: Bank;
       }) => response.data,
     }),
 
-    // ✅ Update existing product
-    updateFundingProduct: builder.mutation<
-      FundingProduct,
-      { id: number; payload: Partial<FundingProduct> }
-    >({
+    // ✅ Update bank
+    updateBank: builder.mutation<Bank, { id: number; payload: Partial<Bank> }>({
       query: ({ id, payload }) => ({
-        url: `/product/funding/${id}`,
+        url: `/master/bank/${id}`,
         method: "PUT",
         body: payload,
       }),
       transformResponse: (response: {
         code: number;
         message: string;
-        data: FundingProduct;
+        data: Bank;
       }) => response.data,
     }),
 
-    // ✅ Delete product
-    deleteFundingProduct: builder.mutation<
-      { code: number; message: string },
-      number
-    >({
+    // ✅ Delete bank
+    deleteBank: builder.mutation<{ code: number; message: string }, number>({
       query: (id) => ({
-        url: `/product/funding/${id}`,
+        url: `/master/bank/${id}`,
         method: "DELETE",
       }),
       transformResponse: (response: {
@@ -106,9 +100,9 @@ export const fundingProductApi = apiSlice.injectEndpoints({
 });
 
 export const {
-  useGetFundingProductsQuery,
-  useGetFundingProductByIdQuery,
-  useCreateFundingProductMutation,
-  useUpdateFundingProductMutation,
-  useDeleteFundingProductMutation,
-} = fundingProductApi;
+  useGetBanksQuery,
+  useGetBankByIdQuery,
+  useCreateBankMutation,
+  useUpdateBankMutation,
+  useDeleteBankMutation,
+} = bankApi;

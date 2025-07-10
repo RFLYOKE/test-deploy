@@ -13,7 +13,7 @@ import {
   useCreateWilayahKerjaMutation,
   useUpdateWilayahKerjaMutation,
   useDeleteWilayahKerjaMutation,
-} from "@/services/wilayahkerja.service";
+} from "@/services/master/wilayahkerja.service";
 import WilayahKerjaForm from "../formModal/wilayah-kerja-form";
 
 export default function WilayahKerjaPage() {

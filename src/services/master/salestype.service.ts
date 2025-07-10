@@ -1,98 +1,93 @@
 import { apiSlice } from "../base-query";
-import { FundingProduct } from "@/types/sales-manage";
+import { SalesType } from "@/types/salestype";
 
-export const fundingProductApi = apiSlice.injectEndpoints({
+export const salesTypeApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    // ✅ Get all funding products
-    getFundingProducts: builder.query<
+    // ✅ Get all sales types
+    getSalesTypes: builder.query<
       {
-        data: FundingProduct[];
-        current_page: number;
+        data: SalesType[];
         last_page: number;
+        current_page: number;
         total: number;
         per_page: number;
       },
-      { page: number; paginate: number; search?: string } // ✅ search optional
+      { page: number; paginate: number }
     >({
-      query: ({ page, paginate, search = "" }) => ({
-        url: `/product/funding?paginate=${paginate}&search=${encodeURIComponent(
-          search
-        )}&page=${page}`,
+      query: ({ page, paginate }) => ({
+        url: `/master/sales-type?paginate=${paginate}&page=${page}`,
         method: "GET",
       }),
       transformResponse: (response: {
         code: number;
         message: string;
         data: {
-          data: FundingProduct[];
           current_page: number;
+          data: SalesType[];
           last_page: number;
           total: number;
           per_page: number;
         };
       }) => ({
         data: response.data.data,
-        current_page: response.data.current_page,
         last_page: response.data.last_page,
+        current_page: response.data.current_page,
         total: response.data.total,
         per_page: response.data.per_page,
       }),
     }),
 
-    // ✅ Get product by ID
-    getFundingProductById: builder.query<FundingProduct, number>({
+    // ✅ Get by ID
+    getSalesTypeById: builder.query<SalesType, number>({
       query: (id) => ({
-        url: `/product/funding/${id}`,
+        url: `/master/sales-type/${id}`,
         method: "GET",
       }),
       transformResponse: (response: {
         code: number;
         message: string;
-        data: FundingProduct;
+        data: SalesType;
       }) => response.data,
     }),
 
-    // ✅ Create new product
-    createFundingProduct: builder.mutation<
-      FundingProduct,
-      Partial<FundingProduct>
-    >({
+    // ✅ Create
+    createSalesType: builder.mutation<SalesType, Partial<SalesType>>({
       query: (payload) => ({
-        url: "/product/funding",
+        url: `/master/sales-type`,
         method: "POST",
         body: payload,
       }),
       transformResponse: (response: {
         code: number;
         message: string;
-        data: FundingProduct;
+        data: SalesType;
       }) => response.data,
     }),
 
-    // ✅ Update existing product
-    updateFundingProduct: builder.mutation<
-      FundingProduct,
-      { id: number; payload: Partial<FundingProduct> }
+    // ✅ Update
+    updateSalesType: builder.mutation<
+      SalesType,
+      { id: number; payload: Partial<SalesType> }
     >({
       query: ({ id, payload }) => ({
-        url: `/product/funding/${id}`,
+        url: `/master/sales-type/${id}`,
         method: "PUT",
         body: payload,
       }),
       transformResponse: (response: {
         code: number;
         message: string;
-        data: FundingProduct;
+        data: SalesType;
       }) => response.data,
     }),
 
-    // ✅ Delete product
-    deleteFundingProduct: builder.mutation<
+    // ✅ Delete
+    deleteSalesType: builder.mutation<
       { code: number; message: string },
       number
     >({
       query: (id) => ({
-        url: `/product/funding/${id}`,
+        url: `/master/sales-type/${id}`,
         method: "DELETE",
       }),
       transformResponse: (response: {
@@ -106,9 +101,9 @@ export const fundingProductApi = apiSlice.injectEndpoints({
 });
 
 export const {
-  useGetFundingProductsQuery,
-  useGetFundingProductByIdQuery,
-  useCreateFundingProductMutation,
-  useUpdateFundingProductMutation,
-  useDeleteFundingProductMutation,
-} = fundingProductApi;
+  useGetSalesTypesQuery,
+  useGetSalesTypeByIdQuery,
+  useCreateSalesTypeMutation,
+  useUpdateSalesTypeMutation,
+  useDeleteSalesTypeMutation,
+} = salesTypeApi;

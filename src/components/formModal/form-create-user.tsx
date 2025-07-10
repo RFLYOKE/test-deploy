@@ -7,6 +7,9 @@ import {
 } from "@/services/users.service";
 import { User, Role, CreateUserPayload } from "@/types/user";
 import Swal from "sweetalert2";
+import { Combobox } from "@/components/ui/combo-box";
+import { useGetSalesCategoriesQuery } from "@/services/master/salescategory.service";
+import { useGetSalesTypesQuery } from "@/services/master/salestype.service";
 
 interface FormCreateUserProps {
   onClose: () => void;
@@ -30,13 +33,24 @@ export default function FormCreateUser({
     password_confirmation: "",
   });
 
+  const [salesCategoryId, setSalesCategoryId] = useState<number | null>(null);
+  const [salesTypeId, setSalesTypeId] = useState<number | null>(null);
+
   const { data: roles = [] } = useGetRolesQuery();
   const [createUser, { isLoading: creating }] = useCreateUserMutation();
   const [updateUser, { isLoading: updating }] = useUpdateUserMutation();
 
+  const { data: salesCategoryResult, isLoading: loadingCategory } =
+    useGetSalesCategoriesQuery({ page: 1, paginate: 9999 });
+
+  const { data: salesTypeResult, isLoading: loadingType } =
+    useGetSalesTypesQuery({ page: 1, paginate: 9999 });
+
+  const salesCategories = salesCategoryResult?.data || [];
+  const salesTypes = salesTypeResult?.data || [];
+
   const isLoading = creating || updating;
 
-  // ✅ FIX LOOP: Gunakan useEffect hanya saat initialData dan roles siap
   useEffect(() => {
     if (!initialData || roles.length === 0) return;
 
@@ -51,9 +65,11 @@ export default function FormCreateUser({
       password: "",
       password_confirmation: "",
     });
+
+    setSalesCategoryId(initialData.sales_category_id || null);
+    setSalesTypeId(initialData.sales_type_id || null);
   }, [initialData, roles]);
 
-  // ✅ Gunakan useMemo agar mapping stabil
   const roleNameToId = useMemo(() => {
     return Object.fromEntries(roles.map((r: Role) => [r.name, r.id]));
   }, [roles]);
@@ -78,6 +94,15 @@ export default function FormCreateUser({
       return;
     }
 
+    if (!salesCategoryId || !salesTypeId) {
+      await Swal.fire({
+        icon: "warning",
+        title: "Data tidak lengkap",
+        text: "Pilih kategori dan tipe sales terlebih dahulu.",
+      });
+      return;
+    }
+
     try {
       const payload: CreateUserPayload = {
         role_id: roleId,
@@ -86,6 +111,8 @@ export default function FormCreateUser({
         phone: form.phone,
         password: form.password,
         password_confirmation: form.password_confirmation,
+        sales_category_id: salesCategoryId,
+        sales_type_id: salesTypeId,
         status: 1,
       };
 
@@ -189,7 +216,32 @@ export default function FormCreateUser({
                 className="w-full px-3 py-2 border rounded bg-gray-50 dark:bg-neutral-700 border-gray-300 dark:border-gray-600"
               />
             </div>
+
+            <div>
+              <label className="block mb-1 text-sm">Kategori Sales</label>
+              <Combobox
+                value={salesCategoryId}
+                onChange={setSalesCategoryId}
+                data={salesCategories}
+                isLoading={loadingCategory}
+                placeholder="Pilih Kategori Sales"
+                getOptionLabel={(item) => item.name}
+              />
+            </div>
+
+            <div>
+              <label className="block mb-1 text-sm">Tipe Sales</label>
+              <Combobox
+                value={salesTypeId}
+                onChange={setSalesTypeId}
+                data={salesTypes}
+                isLoading={loadingType}
+                placeholder="Pilih Tipe Sales"
+                getOptionLabel={(item) => item.name}
+              />
+            </div>
           </div>
+
           <div className="flex justify-end gap-2 pt-4">
             <button
               type="button"

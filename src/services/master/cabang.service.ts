@@ -1,98 +1,95 @@
 import { apiSlice } from "../base-query";
-import { FundingProduct } from "@/types/sales-manage";
+import { Branch } from "@/types/branch";
 
-export const fundingProductApi = apiSlice.injectEndpoints({
+export const branchApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    // ✅ Get all funding products
-    getFundingProducts: builder.query<
+    // ✅ Get all branches with pagination + search
+    getBranches: builder.query<
       {
-        data: FundingProduct[];
-        current_page: number;
+        data: Branch[];
         last_page: number;
+        current_page: number;
         total: number;
         per_page: number;
       },
-      { page: number; paginate: number; search?: string } // ✅ search optional
+      { page: number; paginate: number; search?: string } // <--- Tambahkan search
     >({
       query: ({ page, paginate, search = "" }) => ({
-        url: `/product/funding?paginate=${paginate}&search=${encodeURIComponent(
-          search
-        )}&page=${page}`,
+        url: `/master/cabang`,
         method: "GET",
+        params: {
+          page,
+          paginate,
+          search,
+        },
       }),
       transformResponse: (response: {
         code: number;
         message: string;
         data: {
-          data: FundingProduct[];
           current_page: number;
+          data: Branch[];
           last_page: number;
           total: number;
           per_page: number;
         };
       }) => ({
         data: response.data.data,
-        current_page: response.data.current_page,
         last_page: response.data.last_page,
+        current_page: response.data.current_page,
         total: response.data.total,
         per_page: response.data.per_page,
       }),
     }),
 
-    // ✅ Get product by ID
-    getFundingProductById: builder.query<FundingProduct, number>({
+    // ✅ Get branch by ID
+    getBranchById: builder.query<Branch, number>({
       query: (id) => ({
-        url: `/product/funding/${id}`,
+        url: `/master/cabang/${id}`,
         method: "GET",
       }),
       transformResponse: (response: {
         code: number;
         message: string;
-        data: FundingProduct;
+        data: Branch;
       }) => response.data,
     }),
 
-    // ✅ Create new product
-    createFundingProduct: builder.mutation<
-      FundingProduct,
-      Partial<FundingProduct>
-    >({
+    // ✅ Create branch
+    createBranch: builder.mutation<Branch, Partial<Branch>>({
       query: (payload) => ({
-        url: "/product/funding",
+        url: `/master/cabang`,
         method: "POST",
         body: payload,
       }),
       transformResponse: (response: {
         code: number;
         message: string;
-        data: FundingProduct;
+        data: Branch;
       }) => response.data,
     }),
 
-    // ✅ Update existing product
-    updateFundingProduct: builder.mutation<
-      FundingProduct,
-      { id: number; payload: Partial<FundingProduct> }
+    // ✅ Update branch
+    updateBranch: builder.mutation<
+      Branch,
+      { id: number; payload: Partial<Branch> }
     >({
       query: ({ id, payload }) => ({
-        url: `/product/funding/${id}`,
+        url: `/master/cabang/${id}`,
         method: "PUT",
         body: payload,
       }),
       transformResponse: (response: {
         code: number;
         message: string;
-        data: FundingProduct;
+        data: Branch;
       }) => response.data,
     }),
 
-    // ✅ Delete product
-    deleteFundingProduct: builder.mutation<
-      { code: number; message: string },
-      number
-    >({
+    // ✅ Delete branch
+    deleteBranch: builder.mutation<{ code: number; message: string }, number>({
       query: (id) => ({
-        url: `/product/funding/${id}`,
+        url: `/master/cabang/${id}`,
         method: "DELETE",
       }),
       transformResponse: (response: {
@@ -106,9 +103,9 @@ export const fundingProductApi = apiSlice.injectEndpoints({
 });
 
 export const {
-  useGetFundingProductsQuery,
-  useGetFundingProductByIdQuery,
-  useCreateFundingProductMutation,
-  useUpdateFundingProductMutation,
-  useDeleteFundingProductMutation,
-} = fundingProductApi;
+  useGetBranchesQuery,
+  useGetBranchByIdQuery,
+  useCreateBranchMutation,
+  useUpdateBranchMutation,
+  useDeleteBranchMutation,
+} = branchApi;

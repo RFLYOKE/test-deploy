@@ -19,7 +19,7 @@ import Swal from "sweetalert2";
 export default function AssignmentPage() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
-  const [filterStatus, setFilterStatus] = useState("semua"); // ← Tambahan filter status
+  const [filterStatus, setFilterStatus] = useState("semua");
   const { isOpen, openModal, closeModal } = useModal();
 
   const { data, isLoading, refetch } = useGetAssignmentsQuery({

@@ -1,98 +1,98 @@
 import { apiSlice } from "../base-query";
-import { FundingProduct } from "@/types/sales-manage";
+import { WilayahKerja } from "@/types/wilayah-kerja";
 
-export const fundingProductApi = apiSlice.injectEndpoints({
+export const wilayahKerjaApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    // ✅ Get all funding products
-    getFundingProducts: builder.query<
+    // ✅ Get all wilayah kerja with pagination + search
+    getWilayahKerja: builder.query<
       {
-        data: FundingProduct[];
-        current_page: number;
+        data: WilayahKerja[];
         last_page: number;
+        current_page: number;
         total: number;
         per_page: number;
       },
-      { page: number; paginate: number; search?: string } // ✅ search optional
+      { page: number; paginate: number; search?: string }
     >({
       query: ({ page, paginate, search = "" }) => ({
-        url: `/product/funding?paginate=${paginate}&search=${encodeURIComponent(
-          search
-        )}&page=${page}`,
+        url: `/master/wilayah-kerja`,
         method: "GET",
+        params: {
+          page,
+          paginate,
+          search,
+        },
       }),
       transformResponse: (response: {
         code: number;
         message: string;
         data: {
-          data: FundingProduct[];
           current_page: number;
+          data: WilayahKerja[];
           last_page: number;
           total: number;
           per_page: number;
         };
       }) => ({
         data: response.data.data,
-        current_page: response.data.current_page,
         last_page: response.data.last_page,
+        current_page: response.data.current_page,
         total: response.data.total,
         per_page: response.data.per_page,
       }),
     }),
 
-    // ✅ Get product by ID
-    getFundingProductById: builder.query<FundingProduct, number>({
+    // ✅ Get wilayah kerja by ID
+    getWilayahKerjaById: builder.query<WilayahKerja, number>({
       query: (id) => ({
-        url: `/product/funding/${id}`,
+        url: `/master/wilayah-kerja/${id}`,
         method: "GET",
       }),
       transformResponse: (response: {
         code: number;
         message: string;
-        data: FundingProduct;
+        data: WilayahKerja;
       }) => response.data,
     }),
 
-    // ✅ Create new product
-    createFundingProduct: builder.mutation<
-      FundingProduct,
-      Partial<FundingProduct>
-    >({
+    // ✅ Create wilayah kerja
+    createWilayahKerja: builder.mutation<WilayahKerja, Partial<WilayahKerja>>({
       query: (payload) => ({
-        url: "/product/funding",
+        url: `/master/wilayah-kerja`,
         method: "POST",
         body: payload,
       }),
       transformResponse: (response: {
         code: number;
         message: string;
-        data: FundingProduct;
+        data: WilayahKerja;
       }) => response.data,
     }),
 
-    // ✅ Update existing product
-    updateFundingProduct: builder.mutation<
-      FundingProduct,
-      { id: number; payload: Partial<FundingProduct> }
+    // ✅ Update wilayah kerja
+    updateWilayahKerja: builder.mutation<
+      WilayahKerja,
+      { id: number; payload: Partial<WilayahKerja> }
     >({
       query: ({ id, payload }) => ({
-        url: `/product/funding/${id}`,
+        url: `/master/wilayah-kerja/${id}`,
         method: "PUT",
         body: payload,
       }),
       transformResponse: (response: {
         code: number;
         message: string;
-        data: FundingProduct;
+        data: WilayahKerja;
       }) => response.data,
     }),
 
-    // ✅ Delete product
-    deleteFundingProduct: builder.mutation<
+    // ✅ Delete wilayah kerja
+    deleteWilayahKerja: builder.mutation<
       { code: number; message: string },
       number
     >({
       query: (id) => ({
-        url: `/product/funding/${id}`,
+        url: `/master/wilayah-kerja/${id}`,
         method: "DELETE",
       }),
       transformResponse: (response: {
@@ -106,9 +106,9 @@ export const fundingProductApi = apiSlice.injectEndpoints({
 });
 
 export const {
-  useGetFundingProductsQuery,
-  useGetFundingProductByIdQuery,
-  useCreateFundingProductMutation,
-  useUpdateFundingProductMutation,
-  useDeleteFundingProductMutation,
-} = fundingProductApi;
+  useGetWilayahKerjaQuery,
+  useGetWilayahKerjaByIdQuery,
+  useCreateWilayahKerjaMutation,
+  useUpdateWilayahKerjaMutation,
+  useDeleteWilayahKerjaMutation,
+} = wilayahKerjaApi;

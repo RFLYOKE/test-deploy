@@ -1,30 +1,29 @@
+// src/services/product/fundingproductcategory.service.ts
 import { apiSlice } from "../base-query";
-import { FundingProduct } from "@/types/sales-manage";
+import { FundingProductCategory } from "@/types/sales-manage"; // pastikan sudah buat type ini
 
-export const fundingProductApi = apiSlice.injectEndpoints({
+export const fundingProductCategoryApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    // ✅ Get all funding products
-    getFundingProducts: builder.query<
+    // ✅ Get all funding product categories (paginated)
+    getFundingProductCategories: builder.query<
       {
-        data: FundingProduct[];
+        data: FundingProductCategory[];
         current_page: number;
         last_page: number;
         total: number;
         per_page: number;
       },
-      { page: number; paginate: number; search?: string } // ✅ search optional
+      { page: number; paginate: number }
     >({
-      query: ({ page, paginate, search = "" }) => ({
-        url: `/product/funding?paginate=${paginate}&search=${encodeURIComponent(
-          search
-        )}&page=${page}`,
+      query: ({ page, paginate }) => ({
+        url: `/product/funding/categories?paginate=${paginate}&page=${page}`,
         method: "GET",
       }),
       transformResponse: (response: {
         code: number;
         message: string;
         data: {
-          data: FundingProduct[];
+          data: FundingProductCategory[];
           current_page: number;
           last_page: number;
           total: number;
@@ -39,60 +38,63 @@ export const fundingProductApi = apiSlice.injectEndpoints({
       }),
     }),
 
-    // ✅ Get product by ID
-    getFundingProductById: builder.query<FundingProduct, number>({
+    // ✅ Get by ID
+    getFundingProductCategoryById: builder.query<
+      FundingProductCategory,
+      number
+    >({
       query: (id) => ({
-        url: `/product/funding/${id}`,
+        url: `/product/funding/categories/${id}`,
         method: "GET",
       }),
       transformResponse: (response: {
         code: number;
         message: string;
-        data: FundingProduct;
+        data: FundingProductCategory;
       }) => response.data,
     }),
 
-    // ✅ Create new product
-    createFundingProduct: builder.mutation<
-      FundingProduct,
-      Partial<FundingProduct>
+    // ✅ Create
+    createFundingProductCategory: builder.mutation<
+      FundingProductCategory,
+      Partial<FundingProductCategory>
     >({
       query: (payload) => ({
-        url: "/product/funding",
+        url: `/product/funding/categories`,
         method: "POST",
         body: payload,
       }),
       transformResponse: (response: {
         code: number;
         message: string;
-        data: FundingProduct;
+        data: FundingProductCategory;
       }) => response.data,
     }),
 
-    // ✅ Update existing product
-    updateFundingProduct: builder.mutation<
-      FundingProduct,
-      { id: number; payload: Partial<FundingProduct> }
+    // ✅ Update
+    updateFundingProductCategory: builder.mutation<
+      FundingProductCategory,
+      { id: number; payload: Partial<FundingProductCategory> }
     >({
       query: ({ id, payload }) => ({
-        url: `/product/funding/${id}`,
+        url: `/product/funding/categories/${id}`,
         method: "PUT",
         body: payload,
       }),
       transformResponse: (response: {
         code: number;
         message: string;
-        data: FundingProduct;
+        data: FundingProductCategory;
       }) => response.data,
     }),
 
-    // ✅ Delete product
-    deleteFundingProduct: builder.mutation<
+    // ✅ Delete
+    deleteFundingProductCategory: builder.mutation<
       { code: number; message: string },
       number
     >({
       query: (id) => ({
-        url: `/product/funding/${id}`,
+        url: `/product/funding/categories/${id}`,
         method: "DELETE",
       }),
       transformResponse: (response: {
@@ -106,9 +108,9 @@ export const fundingProductApi = apiSlice.injectEndpoints({
 });
 
 export const {
-  useGetFundingProductsQuery,
-  useGetFundingProductByIdQuery,
-  useCreateFundingProductMutation,
-  useUpdateFundingProductMutation,
-  useDeleteFundingProductMutation,
-} = fundingProductApi;
+  useGetFundingProductCategoriesQuery,
+  useGetFundingProductCategoryByIdQuery,
+  useCreateFundingProductCategoryMutation,
+  useUpdateFundingProductCategoryMutation,
+  useDeleteFundingProductCategoryMutation,
+} = fundingProductCategoryApi;

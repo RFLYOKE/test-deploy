@@ -13,7 +13,7 @@ import {
   useCreateSalesCategoryMutation,
   useUpdateSalesCategoryMutation,
   useDeleteSalesCategoryMutation,
-} from "@/services/salescategory.service";
+} from "@/services/master/salescategory.service";
 import Swal from "sweetalert2"; 
 
 export default function SalesCategoryPage() {
