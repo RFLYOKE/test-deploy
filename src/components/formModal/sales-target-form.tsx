@@ -173,7 +173,7 @@ export default function FormSalesTargetFunding({
                 isLoading={!coordinatorId}
               />
             </div>
-            <div>
+            <div className="col-span-2">
               <label className="text-sm">Tanggal</label>
               <input
                 type="date"
@@ -183,6 +183,8 @@ export default function FormSalesTargetFunding({
               />
             </div>
           </div>
+
+          <hr className="col-span-2"/>
 
           <div>
             <label className="block text-sm mb-2">Detail Target Produk</label>
