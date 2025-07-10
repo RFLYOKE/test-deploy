@@ -82,8 +82,8 @@ export default function SalesPage() {
 
   const filteredSales = salesData.filter(
     (s) =>
-      s.sales_id.toString().includes(search) ||
-      s.coordinator_id.toString().includes(search)
+      s.sales_name.toLowerCase().includes(search) ||
+      s.coordinator_name.toLowerCase().includes(search)
   );
 
   return (
@@ -92,7 +92,7 @@ export default function SalesPage() {
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <Input
-          placeholder="Cari ID sales / coordinator..."
+          placeholder="Cari nama sales / coordinator..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-full sm:w-1/2"

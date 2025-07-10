@@ -133,10 +133,13 @@ export default function AssignmentPage() {
 
   // ✅ Filtering dengan status dan keyword
   const filtered = assignments.filter((a) => {
+    const searchLower = search.toLowerCase();
+
     const matchSearch =
-      a.customer_id.toString().includes(search) ||
-      a.sales_id.toString().includes(search) ||
-      a.coordinator_id.toString().includes(search);
+      a.customer_first_name?.toLowerCase().includes(searchLower) ||
+      a.customer_last_name?.toLowerCase().includes(searchLower) ||
+      a.sales_name?.toLowerCase().includes(searchLower) ||
+      a.coordinator_name?.toLowerCase().includes(searchLower);
 
     const matchStatus =
       filterStatus === "semua" ||
@@ -145,7 +148,7 @@ export default function AssignmentPage() {
       (filterStatus === "completed" && a.status === 2);
 
     return matchSearch && matchStatus;
-  });
+  });  
 
   return (
     <div className="p-6 space-y-6">
@@ -153,7 +156,7 @@ export default function AssignmentPage() {
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <Input
-          placeholder="Cari ID customer / sales / coordinator..."
+          placeholder="Cari nama customer / sales / coordinator..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-full sm:w-1/2"

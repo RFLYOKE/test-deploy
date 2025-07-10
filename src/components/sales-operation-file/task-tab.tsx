@@ -98,7 +98,11 @@ export default function TaskActivityPage() {
 
   // ✅ Terapkan filter status dan search
   const filteredData = taskSchedules.filter((t) => {
-    const matchSearch = t.assignment_id.toString().includes(search);
+    const matchSearch =
+      t.customer_first_name?.toLowerCase().includes(search) ||
+      t.customer_last_name?.toLowerCase().includes(search) ||
+      t.sales_name?.toLowerCase().includes(search) ||
+      t.coordinator_name?.toLowerCase().includes(search);
     const matchStatus =
       filterStatus === "semua" ||
       (filterStatus === "pending" && t.status === 0) ||
@@ -113,7 +117,7 @@ export default function TaskActivityPage() {
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <Input
-          placeholder="Cari Assignment ID..."
+          placeholder="Cari berdasarkan nama..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-full sm:w-1/2"
