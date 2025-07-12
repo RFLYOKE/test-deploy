@@ -10,6 +10,7 @@ import { WilayahKerja } from "@/types/wilayah-kerja";
 import { Branch } from "@/types/branch";
 import { Bank } from "@/types/bank";
 import { CabangBankMitra } from "@/types/cabangbankmitra";
+import { useGetCurrentUserQuery } from "@/services/auth.service";
 
 interface FormPage1Props {
   form: Partial<Customer>;
@@ -50,7 +51,6 @@ const FormPage1: React.FC<FormPage1Props> = ({
   setForm,
   username,
   role,
-  userId,
   wilayahKerjaList,
   loadingWilayahKerja,
   errorWilayahKerja,
@@ -72,20 +72,21 @@ const FormPage1: React.FC<FormPage1Props> = ({
   errorSales,
   setSalesSearch,
 }) => {
-useEffect(() => {
-  if (role === "sales" && !form.sales_id && salesList.length > 0) {
-    const currentSales = salesList.find((s) => s.id === userId);
-    if (currentSales) {
-      setForm({
-        ...form,
-        sales_id: currentSales.id,
-      });
-    }
-  }
-}, [role, userId, salesList, form, setForm]);
+  const { data: currentUser } = useGetCurrentUserQuery();
 
- console.log("role", role);
- console.log("userId", userId);
+ useEffect(() => {
+   if (
+     role === "sales" &&
+     !form.sales_id &&
+     currentUser &&
+     currentUser.roles?.[0]?.name === "sales"
+   ) {
+     setForm({
+       ...form,
+       sales_id: currentUser.id,
+     });
+   }
+ }, [role, form.sales_id, currentUser, setForm]);
 
   return (
     <>
@@ -166,18 +167,11 @@ useEffect(() => {
         <Label htmlFor="sales_id">Sales</Label>
 
         {role === "sales" ? (
-          loadingSales ? (
-            <p className="text-gray-500 text-sm">Memuat data sales...</p>
-          ) : (
-            <Input
-              value={
-                salesList.find((s) => s.id === form.sales_id)?.name ??
-                "Sales tidak ditemukan"
-              }
-              readOnly
-              className="bg-gray-100"
-            />
-          )
+          <Input
+            value={currentUser?.name ?? "Sales tidak ditemukan"}
+            readOnly
+            className="bg-gray-100"
+          />
         ) : (
           <Combobox<User>
             value={form.sales_id ?? null}
@@ -192,7 +186,7 @@ useEffect(() => {
           />
         )}
 
-        {errorSales && (
+        {errorSales && role !== "sales" && (
           <p className="text-sm text-red-500 mt-1">Gagal memuat data sales.</p>
         )}
       </div>
