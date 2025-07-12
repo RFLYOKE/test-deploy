@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Combobox } from "@/components/ui/combo-box";
@@ -15,6 +15,8 @@ interface FormPage1Props {
   form: Partial<Customer>;
   setForm: (data: Partial<Customer>) => void;
   username: string;
+  role: string; // "sales", "superadmin", "koordinator_sales"
+  userId: number;
 
   // Props for relational comboboxes
   wilayahKerjaList: WilayahKerja[];
@@ -47,6 +49,8 @@ const FormPage1: React.FC<FormPage1Props> = ({
   form,
   setForm,
   username,
+  role,
+  userId,
   wilayahKerjaList,
   loadingWilayahKerja,
   errorWilayahKerja,
@@ -68,6 +72,21 @@ const FormPage1: React.FC<FormPage1Props> = ({
   errorSales,
   setSalesSearch,
 }) => {
+useEffect(() => {
+  if (role === "sales" && !form.sales_id && salesList.length > 0) {
+    const currentSales = salesList.find((s) => s.id === userId);
+    if (currentSales) {
+      setForm({
+        ...form,
+        sales_id: currentSales.id,
+      });
+    }
+  }
+}, [role, userId, salesList, form, setForm]);
+
+ console.log("role", role);
+ console.log("userId", userId);
+
   return (
     <>
       {/* --- Relational Combobox Fields --- */}
@@ -145,17 +164,34 @@ const FormPage1: React.FC<FormPage1Props> = ({
 
       <div className="flex flex-col gap-y-1">
         <Label htmlFor="sales_id">Sales</Label>
-        <Combobox<User>
-          value={form.sales_id ?? null}
-          onChange={(id) => setForm({ ...form, sales_id: id })}
-          onSearchChange={setSalesSearch}
-          data={salesList}
-          getOptionLabel={(user: User) =>
-            `${user.name}${user.email ? ` (${user.email})` : ""}`
-          }
-          placeholder={loadingSales ? "Loading..." : "Pilih Sales"}
-          isLoading={loadingSales}
-        />
+
+        {role === "sales" ? (
+          loadingSales ? (
+            <p className="text-gray-500 text-sm">Memuat data sales...</p>
+          ) : (
+            <Input
+              value={
+                salesList.find((s) => s.id === form.sales_id)?.name ??
+                "Sales tidak ditemukan"
+              }
+              readOnly
+              className="bg-gray-100"
+            />
+          )
+        ) : (
+          <Combobox<User>
+            value={form.sales_id ?? null}
+            onChange={(id) => setForm({ ...form, sales_id: id })}
+            onSearchChange={setSalesSearch}
+            data={salesList}
+            getOptionLabel={(user: User) =>
+              `${user.name}${user.email ? ` (${user.email})` : ""}`
+            }
+            placeholder={loadingSales ? "Loading..." : "Pilih Sales"}
+            isLoading={loadingSales}
+          />
+        )}
+
         {errorSales && (
           <p className="text-sm text-red-500 mt-1">Gagal memuat data sales.</p>
         )}
