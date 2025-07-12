@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "../ui/button";
 
 export default function TablePage() {
   const [page, setPage] = useState(1);
@@ -93,10 +94,10 @@ export default function TablePage() {
   const perPage = 10;
 
   return (
-    <div className="px-4 space-y-4">
+    <div className="px2 lg:px-4 space-y-4">
       <div className="flex items-center justify-between flex-wrap gap-2">
         {/* Tab Section */}
-        <div className="flex gap-2 flex-wrap bg-neutral-800 rounded-full">
+        <div className="hidden md:flex gap-2 flex-wrap bg-neutral-300 dark:bg-neutral-800 rounded-full">
           {[
             { label: "Outline", active: true },
             { label: "Past Performance", count: 3 },
@@ -113,7 +114,7 @@ export default function TablePage() {
             >
               <span>{tab.label}</span>
               {tab.count !== undefined && (
-                <span className="text-xs bg-zinc-700 text-white px-2 py-0.5 rounded-full">
+                <span className="text-xs bg-zinc-400 dark:bg-zinc-700 text-white px-2 py-0.5 rounded-full">
                   {tab.count}
                 </span>
               )}
@@ -123,13 +124,12 @@ export default function TablePage() {
 
         {/* Actions Section */}
         <div className="flex gap-2">
-          <button className="px-3 py-1.5 rounded border border-zinc-700 bg-zinc-900 hover:bg-zinc-800 text-sm flex items-center gap-1">
-            <span className="i-lucide-layout-dashboard w-4 h-4" />
+          <Button variant="secondary" size="sm">
             Customize Columns
-          </button>
-          <button className="px-3 py-1.5 rounded bg-white text-black text-sm font-medium hover:bg-zinc-100">
+          </Button>
+          <Button variant="default" size="sm">
             + Add Section
-          </button>
+          </Button>
         </div>
       </div>
 
