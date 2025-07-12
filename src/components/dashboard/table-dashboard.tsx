@@ -94,7 +94,7 @@ export default function TablePage() {
   const perPage = 10;
 
   return (
-    <div className="px2 lg:px-4 space-y-4">
+    <div className="px-2 space-y-4">
       <div className="flex items-center justify-between flex-wrap gap-2">
         {/* Tab Section */}
         <div className="hidden md:flex gap-2 flex-wrap bg-neutral-300 dark:bg-neutral-800 rounded-full">
