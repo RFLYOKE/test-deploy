@@ -1,23 +1,23 @@
 // src/components/dashboard/KanwilNetChart.jsx
 export default function KanwilNetChart() {
   const chartData = [
-    { name: "KANWIL MAKASSAR", nqa: 28, nett: 25 },
-    { name: "KANWIL DENPASAR", nqa: 22, nett: 18 },
-    { name: "KANWIL PADANG", nqa: 8, nett: 10 },
-    { name: "KANWIL MANADO", nqa: 2, nett: 3 },
-    { name: "KANWIL BANDAR LAMPUNG", nqa: 1, nett: 1.5 },
-    { name: "KANWIL BANDUNG", nqa: 1, nett: 2 },
-    { name: "KANWIL SURABAYA", nqa: 1, nett: 1 },
-    { name: "KANWIL PALEMBANG", nqa: 1, nett: 0.5 },
+    { name: "KANWIL MAKASSAR", noa: 28, nett: 25 },
+    { name: "KANWIL DENPASAR", noa: 22, nett: 18 },
+    { name: "KANWIL PADANG", noa: 8, nett: 10 },
+    { name: "KANWIL MANADO", noa: 2, nett: 3 },
+    { name: "KANWIL BANDAR LAMPUNG", noa: 1, nett: 1.5 },
+    { name: "KANWIL BANDUNG", noa: 1, nett: 2 },
+    { name: "KANWIL SURABAYA", noa: 1, nett: 1 },
+    { name: "KANWIL PALEMBANG", noa: 1, nett: 0.5 },
   ];
 
-  const maxVal = Math.max(...chartData.map((d) => Math.max(d.nqa, d.nett)));
+  const maxVal = Math.max(...chartData.map((d) => Math.max(d.noa, d.nett)));
   const scaleFactor = 100 / maxVal; // Skala bar dari 0-100%
 
   return (
     <div className="bg-white dark:bg-zinc-800 p-4 rounded-md shadow">
       <h3 className="text-lg font-semibold mb-4">
-        TOTAL NQA and TOTAL NETT by KANWIL
+        TOTAL NOA and TOTAL NETT by KANWIL
       </h3>
       <div className="flex flex-col h-[300px] justify-between">
         {" "}
@@ -31,10 +31,10 @@ export default function KanwilNetChart() {
               <div className="flex items-center">
                 <div
                   className="bg-blue-500 h-3 rounded-r" // Slightly thinner bar
-                  style={{ width: `${item.nqa * scaleFactor}%` }}
+                  style={{ width: `${item.noa * scaleFactor}%` }}
                 ></div>
                 <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">
-                  {item.nqa}
+                  {item.noa}
                 </span>
               </div>
               <div className="flex items-center mt-0.5">

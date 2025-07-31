@@ -3,7 +3,7 @@ export default function PerformanceSummary() {
   // Data dummy, ganti dengan data aktual Anda
   const summaryData = [
     {
-      label: "TOTAL NQA NEW",
+      label: "TOTAL NOA NEW",
       value: "71",
       color: "text-blue-600",
       bgColor: "bg-blue-100",
